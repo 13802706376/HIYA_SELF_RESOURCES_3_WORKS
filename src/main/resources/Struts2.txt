@@ -1,0 +1,486 @@
+一、概述
+Struts2是以Webwork的设计思想为核心，吸收了Struts1的优点，因此，可以认为Struts2是Struts1和Webwork结合的产物。Struts2是一个兼容Struts1和WebWork的MVC框架，
+XWork----WebWork2---Struts2, XWork核心就是用拦截器处理HTTP请求。
+
+
+
+二、开发流程
+1 引入的jar包
+struts2-core-2.x.x.jar---    Struts 2框架的核心库
+xwork-2.x.x.jar---           XWork库，Struts 2在其上构建
+ognl-2.6.x.jar---            对象图导航语言（Object Graph Navigation Language），Struts 2框架使用的一种表达式语言
+freemarker-2.3.x.jar---      Struts 2的UI标签的模板使用FreeMarker编写
+commons-logging-1.1.x.jar--- ASF出品的日志包，Struts 2框架使用这个日志包来支持Log4J和JDK 1.4+的日志记录。
+Commons-fileupload---        文件上传
+commons-io-1.3.2.jar---      文件上传
+第三方框架集成，比如说与Spring集成，struts2-spring-plugin-2.x.x.jar.
+
+2 web.xml的配置，在struts2框架是通过Filter启动的
+<filter>
+    <filter-name>struts2</filter-name>
+    <filter-class>org.apache.struts2.dispatcher.FilterDispatcher</filter-class>
+</filter>
+<filter-mapping>
+   <filter-name>struts2</filter-name>
+   <url-pattern>/*</url-pattern>
+</filter-mapping>
+
+在FilterDispatcher的init()方法中将会读取类路径下默认的配置文件struts.xml完成初始化操作。
+
+
+3 struts.xml 的配置
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+   <package name="itcast" namespace="/test" extends="struts-default">
+	<action name="helloworld" class="cn.itcast.action.HelloWorldAction">
+		<result name="success">/WEB-INF/page/hello.jsp</result>
+	</action>
+    </package> 
+</struts>
+http://localhost:端口/内容路径/test/helloworld.action
+
+4 Action类
+public class HelloWorldAction
+{
+	private String message;
+	public String getMessage() 
+	{
+		return message;
+	}
+	public void setMessage(String message) 
+	{
+		this.message = message;
+	}
+	public String execute() throws Exception
+	{
+		this.message = "我的第一个struts2应用";
+		return "success";
+	}
+}
+
+5 hello.jsp页面，用EL表达式
+   <body> 
+   ${message} 
+  </body>
+
+6  一组业务功能相关的Action放在同一个包下，通常每个包都应该继承struts-default包， struts-default包是由struts内置的，它定义了struts2内部的众多拦截器和Result类型。Struts2很多核心的功能都是通过这些内置的拦截器实现的。
+
+7  http://server/struts2/path1/path2/path3/test.action的路径寻找
+   path1/path2/path3/----path1/path2/-----path1/，如若找不到，则提示没有Action.
+
+8  result配置类似于struts1中的forward，但struts2中提供了多种结果类型，如： dispatcher(默认值)、 redirect 、 redirectAction 、 plainText。
+<result type="redirectAction">
+        <param name="actionName">helloworld</param>
+	<param name="namespace">/test</param>
+</result>
+<result type="redirect">view.jsp?id=${id}</result>   ---${id}表示取相应action的id属性值
+
+9  FilterDispatcher默认处理的请求是*.do，修改默认的配置方式：
+<struts>
+    <constant name="struts.action.extension" value="do,go"/>
+</struts>
+
+10 配置多个struts配置文件
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<include file="struts-user.xml"/>
+	<include file="struts-order.xml"/>
+</struts>
+
+通过这种方式，我们就可以将Struts 2的Action按模块配置在多个配置文件中。
+
+11 动态方法调用
+http://server/struts/test/helloworld!other.action 表示调用helloworld类的other方法
+
+12 全局forward
+<package>
+.....
+<global-results>
+     <result name="message">/message.jsp</result>
+</global-results>
+</package>
+
+13 常量的配置和使用
+常量可以在下面多个文件中进行定义，struts2加载常量的搜索顺序如下，后面的设置可以覆盖前面的设置：
+default.properties文件
+struts-default.xml
+struts-plugin.xml
+struts.xml
+struts.properties（为了与webwork向后兼容而提供）
+web.xml
+
+<constant name="struts.i18n.encoding" value="UTF-8"></constant>
+指定默认编码集，作用于HttpServletRequest的setCharacterEncoding方法和freemarker、velocity的输出
+ 
+<constant name="struts.action.extension" value="do,action"></constant>
+指定需要struts2处理的请求后缀，默认值为action。如果需要制定多个属性则用“，”隔开。
+ 
+<constant name="struts.serve.static.browserCache" value="false"></constant>
+设置浏览器是否缓存静态内容，默认值为true。开发中设置为false。
+ 
+<constant name="struts.configuration.xml.reload" value="true"></constant>
+struts的配置文件在修改后是否自动加载。默认为false
+ 
+<constant name="struts.devMode" value="true"></constant>
+控制台输出更多的详细错误信息
+ 
+<constant name="struts.ui.theme" value="simple"></constant>
+本设置可以修改struts2中标签的视图主题。修改标签个性化代码样式。
+ 
+<constant name="struts.objectFactory" value="spring"></constant>
+与spring集成时指定spring负责action对象的创建。
+ 
+<constant name="struts.DynamicMethodInvocation" value="false"></constant>
+设置Struts2是否支持动态方法调用，默认值为true。如需关闭设置为false。
+ 
+<constant name="struts.multipart.maxSize" value="1024"></constant>
+上传文件总大小的定义
+
+14 获取HttpServletRequest / HttpSession / ServletContext / HttpServletResponse对象
+    HttpServletRequest request = ServletActionContext.getRequest();
+    ServletContext servletContext = ServletActionContext.getServletContext();
+    HttpSession se = request.getSession(); 	
+    HttpServletResponse response = ServletActionContext.getResponse();
+
+
+
+
+三、基本运作流程
+1 客户端初始化一个指向Servlet容器的http请求
+2 这个请求经过一系列的Filter（有个叫做ActionContextCleanUp的过滤器）
+3 接着FilterDispatcher被调用，FilterDispatcher询问ActionMapper来决定这个请是否需要调用某个Action
+4 如果ActionMapper决定需要调用某个Action，FilterDispatcher把请求的处理交给ActionProxy
+5 ActionProxy通过Configuration Manager询问框架的配置文件，找到需要调用的Action类
+6 ActionProxy创建一个ActionInvocation的实例。
+7 ActionInvocation实例使用命名模式来调用，在调用Action的过程前后，涉及到相关拦截器（Intercepter）的调用。
+8 一旦Action执行完毕，ActionInvocation负责根据struts.xml中的配置找到对应的返回结果。返回结果通常是（但不总是，也可 能是另外的一个Action链）一个需要被表示的JSP或者FreeMarker的模版。在表示的过程中可以使用Struts2 框架中继承的标签。在这个过程中需要涉及到ActionMapper
+在上述过程中所有的对象（Action，Results，Interceptors，等）都是通过ObjectFactory来创建的。
+
+
+
+
+
+四、国际化的支持
+1 转杯资源国际文件
+baseName_language_country.properties
+其中baseName是资源文件的基本名，我们可以自定义<constant name="struts.custom.i18n.resources" value="ApplicationResource" />
+，但language和country必须是java支持的语言和国家
+
+2 对于中文的属性文件，我们编写好后，应该使用jdk提供的native2ascii命令把文件转换为unicode编码的文件。
+命令的使用方式如下：native2ascii  源文件.properties  目标文件.properties
+
+3 JSP页面
+<s:text name="user"/>，name为属性文件中的key
+
+4 Action类中，可以继承ActionSupport，
+String value = getText("user")
+
+5 在表单标签中，通过key属性指定属性文件中的key，如：
+<s:textfield name="realname" key="user"/>
+
+6 动态国际化文本
+  welcome={0},你好,欢迎来到{1}
+  <s:text name="welcome">
+  	<s:param><s:property value="realname"/></s:param>
+	<s:param>传智播客</s:param>
+  </s:text>
+
+ getText(String key, String[] args)
+ getText(String aTextName, List args)
+
+
+
+
+五、自定义拦截器
+<package name="itcast" namespace="/test" extends="struts-default">
+	<interceptors>
+ 	         <interceptor name=“permission" class="cn.itcast.aop.PermissionInterceptor" />
+ 	         <interceptor-stack name="permissionStack">
+ 		     <interceptor-ref name="defaultStack" />
+ 		     <interceptor-ref name=" permission " />
+ 	         </interceptor-stack>
+ 	</interceptors>
+	<action name="helloworld_*" class="cn.itcast.action.HelloWorldAction" method="{1}">
+		<result name="success">/WEB-INF/page/hello.jsp</result>
+		<interceptor-ref name="permissionStack"/>
+	</action>
+</package>
+
+因为struts2中如文件上传，数据验证，封装请求参数到action等功能都是由系统默认的defaultStack中的拦截器实现的，
+所以我们定义的拦截器需要引用系统默认的defaultStack，这样应用才可以使用struts2框架提供的众多功能。
+如果希望包下的所有action都使用自定义的拦截器，可以通过<default-interceptor-ref name=“permissionStack”/>把拦截器定义为默认拦截器。注意：每个包只能指定一个默认拦截器。另外，一旦我们为该包中的某个action显式指定了某个拦截器，则默认拦截器不会起作用。
+
+
+public class PermissionInterceptor implements Interceptor 
+{
+   private static final long serialVersionUID = -5178310397732210602L;
+   public void destroy() {}
+   public void init() {}
+   public String intercept(ActionInvocation invocation) throws Exception 
+   {
+ 	System.out.println("进入拦截器");	
+	if(session里存在用户)
+        {
+	     String result = invocation.invoke();
+	}
+        else
+        {
+	     return “logon”;
+	}
+	//System.out.println("返回值:"+ result);
+	//return result;
+    }
+}
+
+
+
+六、验证框架
+1 手工验证框架
+  if(username==null && "".equals(username.trim()))  
+  { 
+      this.addFieldError("username", "用户名不能为空");
+  }
+  if(this.hasFieldError)
+  {
+      return input;
+  }
+
+   验证失败后，请求转发至input视图：
+   <result name="input">/WEB-INF/page/addUser.jsp</result>
+   
+   addUser.jsp页面
+   <s:fielderror/>
+
+2 XML输入验证框架
+(1) Action类需要继承ActionSupport，然后提供校验文件
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN" "http://www.opensymphony.com/xwork/xwork-validator-1.0.dtd">
+<validators>
+    <field name="username">
+        <field-validator type="requiredstring">
+            <param name="trim">true</param>
+            <message>用户名不能为空!</message>
+        </field-validator>
+    </field>
+</validators>
+
+(2) 在这个校验文件中，对action中字符串类型的username属性进行验证，首先要求调用trim()方法去掉空格，然后判断用户名是否为空。
+该文件需要和action类放在同一个包下，文件的取名应遵守ActionClassName-validation.xml规则，
+其中ActionClassName为action的简单类名，-validation为固定写法。如果Action类为cn.itcast.action.UserAction，
+那么该文件的取名应为：UserAction-validation.xml。
+
+(3) <field>指定action中要校验的属性，<field-validator>指定校验器，
+<message>为校验失败后的提示信息,如果需要国际化，可以为message指定key属性，key的值为属性文件中的key。
+上面指定的校验器requiredstring是由系统提供的，系统提供了能满足大部分验证需求的校验器，这些校验器的定义可以在xwork-2.x.jar中的com.opensymphony.xwork2.validator.validators下的default.xml中找到。
+
+(4) 系统提供的校验器如下：
+@ required (必填校验器,要求field的值不能为null)
+@ requiredstring (必填字符串校验器,要求field的值不能为null,并且长度大于0,默认情况下会对字符串去前后空格)
+@ stringlength(字符串长度校验器,要求field的值必须在指定的范围内,否则校验失败,minLength参数指定最小长度,maxLength参数指定最大长度)
+@ regex(正则表达式校验器,检查被校验的field是否匹配一个正则表达式.expression参数指定正则表达式,
+      caseSensitive参数指定进行正则表达式匹配时,是否区分大小写,默认值为true)
+@ int(整数校验器,要求field的整数值必须在指定范围内,min指定最小值,max指定最大值)
+@ double(双精度浮点数校验器,要求field的双精度浮点数必须在指定范围内,min指定最小值,max指定最大值)
+@ fieldexpression(字段OGNL表达式校验器,要求field满足一个ognl表达式,expression参数指定ognl表达式,该逻辑表达式基于ValueStack进行求值,
+               返回true时校验通过,否则不通过)
+@ email(邮件地址校验器,要求如果field的值非空,则必须是合法的邮件地址)
+@ url(网址校验器,要求如果field的值非空,则必须是合法的url地址)
+@ date(日期校验器,要求field的日期值必须在指定范围内,min指定最小值,max指定最大值)
+@ conversion(转换校验器,指定在类型转换失败时,提示的错误信息)
+@ visitor(用于校验action中的复合属性,它指定一个校验文件用于校验复合属性中的属性)
+@ expression(OGNL表达式校验器,expression参数指定ognl表达式,该逻辑表达式基于ValueStack进行求值,返回true时校验通过,否则不通过,
+  该校验器不可用在字段校验器风格的配置中)
+
+required  必填校验器
+<field-validator type="required">
+       <message>性别不能为空!</message>
+</field-validator>
+
+requiredstring  必填字符串校验器
+<field-validator type="requiredstring">
+       <param name="trim">true</param>
+       <message>用户名不能为空!</message>
+</field-validator>
+
+stringlength：字符串长度校验器
+<field-validator type="stringlength">
+	<param name="maxLength">10</param>
+	<param name="minLength">2</param>
+	<param name="trim">true</param>
+	<message><![CDATA[产品名称应在1-10个字符之间]]></message>
+</field-validator>
+
+int：整数校验器
+<field-validator type="int">
+	<param name="min">1</param>
+	<param name="max">150</param>
+	<message>年龄必须在1-150之间</message>
+</field-validator>
+
+字段OGNL表达式校验器
+<field name="imagefile">
+	<field-validator type="fieldexpression">
+		<param name="expression"><![CDATA[imagefile.length() > 0]]></param>
+		<message>文件不能为空</message>
+	</field-validator>
+</field>
+
+email：邮件地址校验器
+<field-validator type="email">
+	<message>电子邮件地址无效</message>
+</field-validator>
+
+regex：正则表达式校验器
+<field-validator type="regex">
+     <param name="expression"><![CDATA[^13\d{9}$]]></param>
+     <message>手机号格式不正确!</message>
+</field-validator>
+
+
+
+
+七、主要的标签
+<%@ taglib prefix="s" uri="/struts-tags"%>  
+<s:set name="name" value="'kk'" />
+<s:property value="#name"/>
+
+<s:set name="list" value="{'zhangming','xiaoi','liming'}" />
+<s:iterator value="#list" id="name" status="st">
+	<font color=<s:if test="#st.odd">red</s:if><s:else>blue</s:else>
+	<s:property value="name"/></font><br>
+</s:iterator>
+
+<s:set name="age" value="21" />
+<s:if test="#age==23">23</s:if>
+<s:elseif test="#age==21">21</s:elseif>
+<s:else>都不等</s:else> 
+
+如果集合为list
+<s:checkboxlist name="list" list="{'Java','.Net','RoR','PHP'}" value="{'Java','.Net'}"/>
+生成如下html代码：
+<input type="checkbox" name="list" value="Java" checked="checked"/><label>Java</label>
+<input type="checkbox" name="list" value=".Net" checked="checked"/><label>.Net</label>
+<input type="checkbox" name="list" value="RoR"/><label>RoR</label>
+<input type="checkbox" name="list" value="PHP"/><label>PHP</label>
+
+如果集合为MAP
+<s:checkboxlist name="map" list="#{1:'瑜珈用品',2:'户外用品',3:'球类',4:'自行车'}" listKey="key" listValue="value" value="{1,2,3}"/>
+生成如下html代码：
+<input type="checkbox" name="map" value="1" checked="checked"/><label>瑜珈用品</label>
+<input type="checkbox" name="map" value="2" checked="checked"/><label>户外用品</label>
+<input type="checkbox" name="map" value="3" checked="checked"/><label>球类</label>
+<input type="checkbox" name="map" value="4"/><label>自行车</label>
+
+<s:radio name="list" list="{'Java','.Net'}" value="'Java'"/>
+生成如下html代码：
+<input type="radio" name="list" checked="checked" value="Java"/><label>Java</label>
+<input type="radio" name="list" value=".Net"/><label>.Net</label>
+
+<s:select name="list" list="{'Java','.Net'}" value="'Java'"/>
+<select name="list" id="list">
+    <option value="Java" selected="selected">Java</option>
+    <option value=".Net">.Net</option>
+</select>
+
+
+
+八、文件上传
+
+<form enctype="multipart/form-data" action="${pageContext.request.contextPath}/xxx.action" method="post">
+  <input  type="file" name="uploadFile">
+</form>
+
+public class HelloWorldAction
+{
+  private File uploadFile;//得到上传的文件
+  private String uploadFileContentType;//得到文件的类型
+  private String uploadFileFileName;//得到文件的名称
+
+  。。。这里略省了属性的getter/setter方法。。。。。
+
+  public String upload() throws Exception
+{
+	String realpath = ServletActionContext.getServletContext().getRealPath("/images");
+	File file = new File(realpath);
+	if(!file.exists()) file.mkdirs();        
+        FileUtils.copyFile(uploadFile, new File(file, uploadFileFileName));
+	return "success";
+  }
+}
+
+
+九、OGNL表达式和JSTL、EL的区别
+OGNL: 对象图导航语言
+el: ${user.name}
+OGNL: user.name     在xml中    <result type="redirect">view.jsp?id=${id}</result>
+访问对象   <s property value="user.username"/>
+访问对象中的一般属性  <s property value="user.address.addr"/> 
+访问对象的静态属性  <s property value="@com.czj.vo.Address@YIPS"/> 
+访问Aaction静态方法  <s property value="@com.czj.action.LoginAction@get()"/>  	
+访问值栈对象的方法    <s property value="user.get()"/>  
+访问JDK静态方法    <s property value="@java.lang.Math@float(22.4)"/>或<s property value="@@float(22.4)"/>    不写类自动会从lang包中找到
+访问JDK静态方法    <s property value="@java.util.Canlendar@getInstance().getYear()"/>   
+访问普通类构造方法    <s property value="new com.czj.vo.Address('wade,'stu',24).name"/>   
+访问lList    <s property value="nameList.size"/> 
+访问List某一个值    <s property value="nameList[0]"/>     类似于数组的下标形式
+访问Set    <s property value="nameSet"/> 
+访问Set某一个值    <s property value="nameList[0]"/>     
+访问Map    <s property value="nameMap"/> 
+访问Map某一个值    <s property value="nameMap['m1']"/>     
+访问数组    <s property value="nameArray"/> 
+访问数组某一个值    <s property value="nameArray[4]"/>    
+
+
+
+十、类型转换框架
+
+
+
+十一、Struts1和Struts2的对比
+@ 类:
+Struts1要求Action类继承一个抽象基类。Struts1的一个普遍问题是使用抽象类编程而不是接口。
+Struts 2 Action类可以实现一个Action接口，也可实现其他接口，使可选和定制的服务成为可能。Struts2提供一个ActionSupport基类去实现常用的接口。Action接口不是必须   的，任何有execute标识的POJO对象都可以用作Struts2的Action对象。
+
+@ 线程模式:
+Struts1 Action是单例模式并且必须是线程安全的，因为仅有Action的一个实例来处理所有的请求。单例策略限制了Struts1 Action能作的事，并且要在开发时特别小心。        Action资源必须是线程安全的或同步的。
+Struts2 Action对象为每一个请求产生一个实例，因此没有线程安全问题。（实际上，servlet容器给每个请求产生许多可丢弃的对象，并且不会导致性能和垃圾回收问题）
+
+Servlet 依赖:
+Struts1 Action 依赖于Servlet API ,因为当一个Action被调用时HttpServletRequest 和 HttpServletResponse 被传递给execute方法。
+Struts 2 Action不依赖于容器，允许Action脱离容器单独被测试。如果需要，Struts2 Action仍然可以访问初始的request和response。但是，其他的元素减少或者消除了直接    访问HttpServetRequest 和 HttpServletResponse的必要性。
+
+@ 可测性:
+测试Struts1 Action的一个主要问题是execute方法暴露了servlet API（这使得测试要依赖于容器）。一个第三方扩展－－Struts TestCase－－提供了一套Struts1的模拟对象（来进行测试）。
+Struts 2 Action可以通过初始化、设置属性、调用方法来测试，“依赖注入”支持也使测试更容易。
+
+@ 捕获输入:
+Struts1 使用ActionForm对象捕获输入。所有的ActionForm必须继承一个基类。因为其他JavaBean不能用作ActionForm，开发者经常创建多余的类捕获输入。动态Bean（DynaBeans）可以作为创建传统ActionForm的选择，但是，开发者可能是在重新描述(创建)已经存在的JavaBean（仍然会导致有冗余的javabean）。
+Struts 2直接使用Action属性作为输入属性，消除了对第二个输入对象的需求。输入属性可能是有自己(子)属性的rich对象类型。Action属性能够通过 web页面上的taglibs访问。Struts2也支持ActionForm模式。rich对象类型，包括业务对象，能够用作输入/输出对象。这种 ModelDriven 特性简化了taglib对POJO输入对象的引用。
+
+@ 表达式语言：
+Struts1 整合了JSTL，因此使用JSTL EL。这种EL有基本对象图遍历，但是对集合和索引属性的支持很弱。
+Struts2可以使用JSTL，但是也支持一个更强大和灵活的表达式语言－－"Object Graph Notation Language" (OGNL).
+
+@ 绑定值到页面（view）:
+Struts 1使用标准JSP机制把对象绑定到页面中来访问。
+Struts 2 使用 "ValueStack"技术，使taglib能够访问值而不需要把你的页面（view）和对象绑定起来。ValueStack策略允许通过一系列名称相同但类型不同的属性重用页面（view）。
+
+@ 类型转换：
+Struts 1 ActionForm 属性通常都是String类型。Struts1使用Commons-Beanutils进行类型转换。每个类一个转换器，对每一个实例来说是不可配置的。
+Struts2 使用OGNL进行类型转换。提供基本和常用对象的转换器。
+
+@ 校验：
+Struts 1支持在ActionForm的validate方法中手动校验，或者通过Commons Validator的扩展来校验。同一个类可以有不同的校验内容，但不能校验子对象。
+Struts2支持通过validate方法和XWork校验框架来进行校验。XWork校验框架使用为属性类类型定义的校验和内容校验，来支持chain校验子属性
+
+@ Action执行的控制：
+Struts1支持每一个模块有单独的Request Processors（生命周期），但是模块中的所有Action必须共享相同的生命周期。
+Struts2支持通过拦截器堆栈（Interceptor Stacks）为每一个Action创建不同的生命周期。堆栈能够根据需要和不同的Action一起使用。
+

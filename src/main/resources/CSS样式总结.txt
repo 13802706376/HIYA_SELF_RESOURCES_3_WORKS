@@ -1,0 +1,135 @@
+字体   
+color:red;   
+font-family:Verdana,宋体;   
+font-size:12px;   
+font-weight:(bold,normal,100,400,700,800,900);                    //字体宽度（加粗，400相当于normal，700相当于blod）   
+
+文本   
+text-decoration:(underline,overline,line-through,normal);         //字体格式（下划线，上划线，穿越线，正常）   
+text-transform:(uppercase,lowercase,capitalize,normal);           //转换字母（全大写，全小写，首字母大写，正常）   
+line-height:20px;                                                 //行高   
+letter-spacing:1px;                                               //字母间距   
+word-spacing:2px;                                                 //单词间距   
+text-indent:5px;                                                  //缩进距离   
+text-align:(center,left,right);                                   //文字排版（靠左，靠右，中间）   
+word-break:(break-all,normal);                                    //文字是否换行（换行，不换行）   
+
+背景   
+background-color:red;                                             //背景颜色   
+background-attachment:fixed(scroll);                              //背景图片随内容的转变模式（固定，随着转动）   
+background-image:url(images/001.jpg)(none);                       //背景图片的地址   
+background-position:20% top;                                      //背景图片的位置（x坐标 y坐标）   
+background-repeat:(repeat,no-repeat,repeat-x,repeat-y);           //图片很小的时候是否重叠（重叠，不重叠，水平方向重叠，垂直方向重叠）  
+ 
+定位   
+position:(absolute,static,fixed,relative);                                 //显示方式（层叠的，正常的，固定的）   
+z-index:3;                                                        //多个层叠的层叠优先级，高的在最上面   
+top:20px;                                                         //定位，离顶部距离   
+right:20px;                                                       //定位，离右边距离   
+left:20px;                                                        //定位，离左边距离   
+bottom:20px;                                                      //定位，离底部距离   
+
+尺寸   
+height:300px;                                                           
+max-height:200%;   
+min-height:20%;   
+width:20px;   
+max-height:200px;   
+min-height:20px;  
+
+布局   
+clear:(left,right,none,both);                                     //设置不可漂浮的地区，和float一起用（左侧不能漂，右侧不能漂，都能漂，都不能漂，）   
+float:(left,right,none);                                          //漂浮的地区，必须另一个div没有设置clear（漂左边，票右边，不漂）   
+clip:rect(20,0,30,0);                                             //裁切图片（上，右，下，左）   
+overflow:(auto,hidden,scroll);                                    //滚动条设置（自动的，隐藏的，一定有的）   
+overflow-x:(auto,hidden,scroll);                                  //X轴滚动条设置（自动的，隐藏的，一定有的）   
+overflow-y:(auto,hidden,scroll);                                  //Y轴滚动条设置（自动的，隐藏的，一定有的）   
+display:(none,block,inline);                                      //隐藏或出现某段区域（隐藏，显示，内联显示）   
+visibilty:(hidden,visible);                                       //东西实际是存在的，只是不可见，但是display设置hidden时东西不存在   
+margin:10% 2% 0% 1%;                                              //该标签外侧的绝对定位（上，右，下，左）   
+padding:10% 2% 0% 1%;                                             //该标签内侧的绝对定位（上，右，下，左）   
+zoom : 0.75;                                                      //查看该标签的缩放比例   
+
+边框   
+border-color:#DCDCDC;                                             //边框颜色   
+border-style:(solid,none,double,dotted,dashed);                   //边框格式（实线边框，无边框，双线边框，点线边框，虚线边框）   
+border-width:2px;                                                 //边框宽度     
+border-top-color:#DCDCDC;   
+border-top-style:(solid,none,double,dotted,dashed);   
+border-top-width:2px;   
+border-left-color:#DCDCDC;   
+border-left-style:(solid,none,double,dotted,dashed);   
+border-left-width:2px;   
+border-right-color:#DCDCDC;   
+border-right-style:(solid,none,double,dotted,dashed);   
+border-right-width:2px;   
+border-botton-color:#DCDCDC;   
+border-botton-style:(solid,snone,double,dotted,dashed);   
+border-botton-width:2px;  
+
+表格   
+border-collapse:(collapse,separate);                              //表格的格式（单线的，离线的）   
+border-collapse:separate;border-spacing:10px;                     //表格若为离线，设置行与行的边距   
+empty-cells:(show,hiddens);                                       //内容为空是否显示边框（显示，隐藏）   
+table-layout:(fixed,auto);                                        //表格样式（固定的，灵活的）   
+滚动条   
+scrollbar-arrow-color:red;                                        //箭头的颜色   
+scrollbar-3dlight-color:red;                                      //边框的颜色   
+scrollbar-face-color:red;                                         //表面的颜色   
+scrollbar-track-color:red;                                        //背景的颜色   
+scrollbar-highlight-color:red;                                    //边框、背景的颜色   
+scrollbar-base-color:red;                                         //表面、边框、背景的颜色   
+  
+  
+cursor   
+auto                                                              //默认值   
+all-scroll                                                        //有上下左右四个箭头   
+col-resize                                                        //有左右两个箭头，中间由竖线分隔开的光标    
+crosshair                                                         //简单的十字线光标   
+default                                                           //客户端平台的默认光标   
+hand                                                              //竖起一只手指的手形光标   
+move                                              //十字箭头光标,用于标示对象可被移动   
+help                                  //带有问号标记的箭头   
+no-drop                               //带有一个被斜线贯穿的圆圈的手形光标   
+not-allowed                           //禁止标记(一个被斜线贯穿的圆圈)光标   
+pointer                               //和 hand 一样   
+progress                                  //带有沙漏标记的箭头光标   
+row-resize                            //有上下两个箭头，中间由横线分隔开的光标   
+text                                  //用于标示可编辑的水平文本的光标   
+vertical-text                             //用于标示可编辑的垂直文本的光标   
+wait                                  //用于标示程序忙用户需要等待的光标   
+*-resize                              //用于标示对象可被改变尺寸方向的箭头光标 se-resize,nw-resize   
+url(url)                                  //用户自定义光标,使用绝对或相对 url 地址指定光标文件(后缀为 .cur 或者 .ani )  
+
+
+类型选择符   
+div{ font-size:14px; width:120px; }       
+table,tr,td,body{color:red;}   
+  
+属性选择符   
+h[title] { color: blue; }    
+span[class=demo] { color: red; }    
+div[speed="fast"][dorun="no"] { color: red; }    
+  
+包含选择符   
+table[id=123] td{ font-size:14px; }    
+div ul>li p{ font-size:14px; }    
+  
+ID选择符   
+#name { font-size:14px; }    
+  
+类选择符   
+div.note { font-size:14px; }    
+.dream { font-size:14px; }    
+  
+  
+伪类   
+a:link {font-size: 14pt;}                                         //未访问   
+a:hover {font-size: 14pt;}                                        //鼠标停留   
+a:active {font-size: 14pt;}                                       //点击   
+a:visited {font-size: 14pt; }                                     //已访问过   
+  
+  
+滤镜   
+filter:progid:DXImageTransform.Microsoft.Gradient(enabled=true,startColorStr=red,endColorStr=blue,GradientType=1)    
+filter:progid:DXImageTransform.Microsoft.Alpha(enabled=true,style=0,opacity=4,finishOpacity=67,startX=2,startY=5,finishX=2,finishY=7) 

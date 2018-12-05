@@ -1,0 +1,197 @@
+从控制台输入数字，数字范围不限制，把该数字转化为二进制、八进制、十六进制。。
+
+package com.umt.czj;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+/**
+* 1.把十进制转化为二进制
+* 2.把十进制转化为八进制
+* 3.把十进制转化为十六进制
+* @author caozhijun
+*/
+public class NumberTransfer
+{
+    // 二进制参数
+    private static final Long TWO_NUMBER_STEP = 2L;
+    
+    // 八进制参数
+    private static final Long EIGHT_NUMBER_STEP = 8L;
+    
+    // 十六进制参数
+    private static final Long SIXTEEN_NUMBER_STEP = 16L;
+    
+    // 表达式结果长度
+    private static final int NUMBER_STEPS = 32;
+    
+    // 十六进制大于等于10用字母代替
+    private static final int NUMBER_TEN = 10;
+    
+    // 十六进制小于等于15用字母代替
+    private static final int NUMBER_FIFTEEN = 15;
+    
+    // 待处理数字超过二进制范围报错
+    private static final String EXCEED_RANG_BINARY = "The number exceeding rang for binary!";
+    
+    // 待处理数字超过八二进制范围报错
+    private static final String EXCEED_RANG_OCTAL = "The number exceeding rang for octal!";
+    
+    // 待处理数字超过十六进制范围报错
+    private static final String EXCEED_RANG_HEX = "The number exceeding rang for hex!";
+    
+    // 十六进制数字子母映射表
+    private static Map<Long, String> hexMap = new HashMap<Long, String>();
+    
+    /**
+     * main方法
+     * @param args
+     */
+    public static void main(String[] args)
+    {
+        try
+        {
+            Scanner scan = new Scanner(System.in);
+            System.out.println("请输入十进制数字：");
+            
+            // 从控制台输入的数字转化为大数字型
+            BigInteger number = scan.nextBigInteger();
+            
+            System.err.println(number + "的  二进制表示形式为: "
+                    + getNumberByStep(number, TWO_NUMBER_STEP));
+            
+            System.err.println(number + "的  八进制表示形式为: "
+                    + getNumberByStep(number, EIGHT_NUMBER_STEP));
+            
+            System.err.println(number + "的十六进制表示形式为: "
+                    + getNumberByStep(number, SIXTEEN_NUMBER_STEP));
+        }
+        catch (Throwable th)
+        {
+            th.printStackTrace();
+            throw new RuntimeException(th);
+        }
+    }
+    
+    /**
+     * 根据数字来源和进制参数得到结果的处理逻辑
+     * @param number
+     * @param step
+     * @return
+     */
+    public static String getNumberByStep(BigInteger number, Long step)
+    {
+        hexMap.put(10L, "A");
+        hexMap.put(11L, "B");
+        hexMap.put(12L, "C");
+        hexMap.put(13L, "D");
+        hexMap.put(14L, "E");
+        hexMap.put(15L, "F");
+        
+        BigInteger result = new BigInteger(step.toString());
+        String numberModel = "00000000000000000000000000000000";
+        List<String> numberList = new ArrayList<String>();
+        for (int i = 0; i < numberModel.length(); i++)
+        {
+            numberList.add(numberModel.substring(i, i + 1));
+        }
+        
+        // 进制的阶乘和结果映射
+        Map<Integer, BigInteger> map_step = new HashMap<Integer, BigInteger>();
+        
+        for (int i = 0; i < NUMBER_STEPS; i++)
+        {
+            if (0 == i)
+            {
+                map_step.put(i, new BigInteger("1"));
+            }
+            
+            else if (1 == i)
+            {
+                map_step.put(i, new BigInteger(step.toString()));
+                
+            }
+            else
+            {
+                result = result.multiply(new BigInteger(step.toString()));
+                map_step.put(i, result);
+            }
+            
+        }
+        
+        // 进制转换逻辑
+        for (int i = NUMBER_STEPS - 1; i >= 0; i--)
+        {
+            BigInteger value = map_step.get(i);
+            int index = 0;
+            
+            // 待处理数字比映射结果大
+            if (number.min(value).equals(value))
+            {
+                index = i;
+                
+                // 相除的结果
+                BigInteger divideResult = number.divide(value);
+                long divideResultInteger = divideResult.longValue();
+                String divideResultString = divideResult.toString();
+                
+                //余数
+                BigInteger remainderResult = number.remainder(value);
+                
+                // 若为十六进制且相除的结果在10~15之间则取映射结果
+                if (step == SIXTEEN_NUMBER_STEP
+                        && divideResultInteger >= NUMBER_TEN
+                        && divideResultInteger <= NUMBER_FIFTEEN)
+                {
+                    
+                    divideResultString = hexMap.get(divideResultInteger);
+                    numberList.set(NUMBER_STEPS - index - 1, divideResultString);
+                }
+                else
+                {
+                    // 二进制超过范围
+                    if (TWO_NUMBER_STEP == step
+                            && (TWO_NUMBER_STEP - 1 < divideResultInteger ||  0 > divideResultInteger))
+                    {
+                        return EXCEED_RANG_BINARY;
+                    }
+                    
+                    // 八进制超过范围
+                    if (EIGHT_NUMBER_STEP == step
+                            && ( EIGHT_NUMBER_STEP - 1 < divideResultInteger || 0 > divideResultInteger))
+                    {
+                        return EXCEED_RANG_OCTAL;
+                    }
+                    
+                    // 十六进制超过范围
+                    if (SIXTEEN_NUMBER_STEP == step
+                            && ( SIXTEEN_NUMBER_STEP - 1 <divideResultInteger|| 0 > divideResultInteger ))
+                    {
+                        return EXCEED_RANG_HEX;
+                    }
+                    
+                    // 数字模板集合设值
+                    numberList.set(NUMBER_STEPS - index - 1,
+                            divideResult.toString());
+                }
+                
+                // 把余数赋值给待处理数字，进行下一轮循环，直到最后一轮得到结果
+                number = remainderResult;
+            }
+            
+        }
+        
+        // 返回计算结果
+        String resultData = "";
+        for (int j = 0; j < numberList.size(); j++)
+        {
+            String tempNumber = numberList.get(j);
+            resultData += tempNumber;
+        }
+        
+        return resultData;
+    }
+}
+

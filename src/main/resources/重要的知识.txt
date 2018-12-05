@@ -1,0 +1,48 @@
+
+
+
+
+JSP
+
+导入外部jsp文件：
+
+<%@include  file=”wade.jsp”%>
+
+导入外部js文件：
+
+<script language=”javascript” src=”wade.js”></script>
+
+导入外部css文件：
+
+<link type=”text/css” href=”wade.css”/>
+
+导入外部java文件：
+
+<%page import=”com.umt.vo.Wade”%>
+
+获取文本值的几种方法：
+
+var name = form1[“name”].value;
+
+var name = form1.name.value;
+
+var name = document.getElementById(“name”).value;
+
+var name = document.getElementsByName(“name”)[0].value;
+
+文本框的属性：
+
+form1.name.title：冒泡提示
+
+maxlength:最大长度
+
+readonly:只读，不能修改
+
+表格单边框：
+
+<style style=”text/css”>
+
+.sigleBorder{border-collapse:collapse}
+
+</style>
+

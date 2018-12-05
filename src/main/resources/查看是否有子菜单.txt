@@ -1,0 +1,36 @@
+public String getTabHaveChild(List rootList,List otherList)   
+    {   
+        List<W3WndletInstanceVO> list = new ArrayList<W3WndletInstanceVO>();   
+        if (null != rootList && rootList.size() > 0)   
+        {   
+            list.addAll(rootList);   
+        }   
+        if (null != otherList && otherList.size() > 0)   
+        {   
+            list.addAll(otherList);   
+        }   
+        StringBuffer sb = new StringBuffer("");   
+        if (null != list && list.size() > 0)   
+        {   
+            for (int k = 0; k < list.size(); k++)   
+            {   
+                W3WndletInstanceVO vo = list.get(k);   
+                String tabId = vo.getChannelId();   
+                boolean isChildFlag = false;   
+                for (int i = 0; i < list.size(); i++)   
+                {   
+                    W3WndletInstanceVO vo2 = list.get(i);   
+                    if (null != vo2.getOwner() && vo2.getOwner().equals(tabId))   
+                    {   
+                        isChildFlag = true;   
+                        break;   
+                    }   
+                }   
+                if (isChildFlag)   
+                {   
+                    sb.append(tabId.toString() + ";");   
+                }   
+            }   
+        }   
+        return sb.toString();   
+    }  

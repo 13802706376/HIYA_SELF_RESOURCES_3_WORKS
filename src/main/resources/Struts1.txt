@@ -1,0 +1,600 @@
+一、概述
+Struts Framework是一个开源的应用于MVC模式的WEB开发框架，扮演的角色是控制层。
+最早是作为Apache Jakarta项目的组成部分，框架的主要架构设计和开发者是Craig R.McClanahan。
+
+
+
+
+二、基本运作流程
+1. 服务器启动的时候读取web.xml文件，加载ActionServlet类并初始化struts-config-xxx.xml文件，把配置信息如action路径、action名称、formBean信息、全局跳转信息放到ActionMapping中，跳转路径封装为action的一个ActionFarword对象，ActionMapping包含ActionFarword。
+
+2. 用户在前台客户端发送HTTP请求到后台，负责接收请求的控制器是ActionServlet类，该类继承HttpServlet类，如果ActionForm实例不存在，容器也会创建一个ActionForm对象,封装所有的请求参数，此时容器会根据配置信息决定是否需要表单验证。如果需要验证，就调用ActionForm的validate()方法。如果ActionForm的validate（）方法返回一个包含一个或多个ActionMessage的ActionErrors对象，就表示表单验证失败，此时ActionServlet将直接把请求转发给包含用户提交表单的JSP组件。在这种情况下，不会在创建Action对象并调用Action的execute()方法。
+
+3. 如果返回null则表示验证成功，下一步ActionServlet把请求交付RequestProcessor类处理，该类负责进行action分发，从配置信息中找出请求路径对应的action类，如果不存在，就返回用户请求路径无效的信息。若找到有对应的action而且没有实例，则初始化一个实例，并调用里面的execute方法，execut调用业务逻辑和数据访问层进行业务流程处理，返回一个ActionForward对象，由视图显示处理的结果，視图部份可以是HTML、JSP、Struts自定义标签、PDF文件、Excel文件、一个请求等。
+
+4. 四个主要类的请求顺序是：ActionMapping--ActionForm---Action---ActionForward.
+
+5. RequestProcessor类包含一个HashMap，作为存放所有Action实例的缓存。每个Action实例在缓存中存放的key为Action类名。在RequestProcessor类的processActionCreate()方法中，首先检查在HashMap中是否存在Action实例，如果有直接使用，否则创建一个新的。创建Action实例的代码位于同步代码块中，以保证只有一个线程创建Action实例，然后放在HashMap中。供其他线程使用。所以说Servlet和Struts1都是单例模式。
+
+
+
+
+三、主要的包、组件
+1. 主要的包及作用
+org.apache.struts.Action：控制整个struts1框架运行的核心类；如ActionServlet,RequestProcessor,Action,ActionMapping,ActionForm,ActionForward等
+org.apache.struts.Actions：特定适配器转换功能；如DispatchAction
+org.apache.struts.Config：提供对配置文件struts-config.xml元素的映射
+org.apache.struts.Taglib：标签类的集合，包括html,logic,bean
+org.apache.struts.Util：支持web Application的一些常用服务功能
+org.apache.struts.Validator：用于动态的配置form表单验证(struts1.1以上)
+
+2 控制层的分类
+@ ActionServlet（公司的老总）
+用来接受所有客户端的*.do请求，但是他本身不会去处理请求，而是将请求委托给RequestProcessor全权处理；
+@ RequestProcessor（项目总监）
+用来接受ActionServlet转发过来的请求并处理请求，它会根据struts.xml中的配置调用不同的Action去全权处理客户端不同的请求；
+@ Action：（程序员）
+它的功能和Servlet一样作为控制器来控制和转发请求，由它去调用模型层中的业务接口方法，并根据不同的结果选择不同的视图显示； 
+
+3 模型层中的ActionForm（需求分析师）
+a.封装提交表单中的字段信息
+b.对提交表单中的字段信息进行验证(服务器端验证)
+c.可以对表单中的字段信息重新赋值
+
+4 ActionMapping（美工）
+ActionServlet只是任务的分派者，它依请求分配任务给其它的对象来执行，而分配的依据是请求的URI以及struts-config.xml的<action-mappings>卷标所设定的内容。 
+<action-mappings>用来描述一组ActionMapping对象，当中的每一个<action>卷标都对应一个ActionMapping对象，当客户端发出请求至ActionServlet时，ActionServlet根据其URI及<action>卷标设定的path属性查看对应的ActionMapping对象，ActionMapping对象会告诉ActionServlet该使用哪一个Action对象（在<action>卷标中使用type属性设定），而ActionServlet再将工作交给该Action对象来执行。 
+
+5 ActionForward（验收人员）
+ActionForword继承自ForwardConfig，它实际上是用来封装视图路径和转发请求方式的一个对象，目的是控制器将 Action 类的处理结果转发至目的地。
+这个对象可以有两种创建方式： 
+return new ActionForward("/basic/error.jsp"); 
+return mapping.findForward("error"); 
+
+6 ActionMessages和ActionErrors（测试人员）
+尽管Struts框架提供了有效的异常处理机制，但不能保证处理所有的错误，这时Struts框架会把错误抛给Web容器，在默认情况下Web容器会向用户浏览器直接返回原始信息。如果想避免直接让用户看到这些原始信息，可以在web.xml中配置<error-page>元素。
+
+7 引入的包介绍
+antlr.jar --- 接受词文法语言的描述
+commons-beanutils.jar ---提供对JAVA的反射和自省API的包装
+commons-digester.jar ---用于XML到Java对象的映射，处理struts-config.xml配置文件，已达到生成对应的对象。
+commons-fileupload.jar ---支持文件上传功能
+commons-validator.jar ---对表单进行验证，支持校验规则和错误消息的国际化
+commons-logging.jar --- 支持日志的输出
+jakarta-oro.jar --- 文本处理工具，支持正则表达式、blob表达式、替换、分割、文件名过滤的功能。
+struts.jar---struts的核心jar包
+
+
+
+
+四、代码开发主要步骤
+1 引入jar包（见3.7介绍）
+
+2 web.xml配置
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.4" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee   http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+  <servlet>
+    <servlet-name>action</servlet-name>
+    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+    <init-param>
+      <param-name>config</param-name>
+      <param-value>/WEB-INF/struts-config.xml</param-value>
+    </init-param>
+    <init-param>
+      <param-name>debug</param-name>
+      <param-value>3</param-value>
+    </init-param>
+    <load-on-startup>0</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>action</servlet-name>
+    <url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+  <error-page> 
+    <error-code>404</error-code> 
+    <location>/exception/error404.jsp</location> 
+  </error-page> 
+  <error-page> 
+    <error-code>500</error-code> 
+    <location>/exception/error500.jsp</location> 
+  </error-page> 
+  <error-page> 
+    <exception-type>java.lang.Exception</exception-type> 
+    <location>/exception/default.jsp</location> 
+  </error-page> 
+</web-app>
+
+3 struts-config.xml的配置
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+<struts-config>
+  <data-sources />
+  <form-beans >
+  <form-bean name="loginForm" type="form.LoginForm">
+  </form-bean>
+  </form-beans>
+  <global-exceptions />
+  <global-forwards />
+   <global-results>     ---全局页面导航
+            <result name="global">/jsp/login.jsp</result>   
+        </global-results> 
+  <action-mappings >
+  <action path="/login" parameter="method" name="loginForm" type="action.LoginAction">
+			<forward name="ok" path="/index.jsp"></forward>
+			<forward name="error" path="/login.jsp"></forward>
+		</action>
+    <action path="/manBookInfo" parameter="method" name="loginForm" type="action.ManBookAction">
+			<forward name="ok" path="/index.jsp"></forward>
+			<forward name="edit" path="/addBookInfo.jsp"></forward>
+		</action>
+  </action-mappings>
+  <message-resources parameter="action.ApplicationResources" />
+</struts-config>
+
+4 login.jsp页面
+<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
+<%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic"%>
+ entryForm.action="login.do?method=login";
+ entryForm.submit(); 
+
+5 LoginAction类
+public class LoginAction extends DispatchAction
+{
+	public ActionForward login(ActionMapping map, ActionForm form,
+			HttpServletRequest req, HttpServletResponse res) throws Exception
+	{
+		LoginForm loginForm = (LoginForm) form;
+		String forward = null;
+		
+		if(null!=loginForm.getUserName()&&"wade399".equals(loginForm.getUserName())
+				&&null!=loginForm.getPwd()&&"123".equals(loginForm.getPwd()))
+		{
+			forward = "ok";
+			List<Book> books = BookService.getBookService().getBookInfoAll();
+			req.setAttribute("books",books);
+			return map.findForward(forward);
+		}
+		else
+		{
+			forward = "error";
+			req.setAttribute("errorInfo", "The userName or pwd is error！");
+			return map.findForward(forward);
+		}
+	}
+}
+
+
+
+
+五、国际化的支持
+浏览器设置语言，到Requestprosessor类中找到session中的Local,如果为空则取浏览器中的，否则取session的，
+如果Local没有对应的国际化资源文件，比如说浏览器设置的是意大利，或session中的是意大利，
+而没有意大利的MessageResource文件，则从操作系统中读取相应的语言，
+如果您操作系统提供的语言也没有国际化文件的话则读取默认的MessageResource.properties。
+
+不同用户在不同的国家，可以自定义Local,再放到session里面，注意，一个用户对应一个session.
+当执行bean:meaasge标签命令的时候，标签类会获得session里面的Local,获取对应的国际资源文件内容显示出来。
+
+1 struts-config.xml中配置message-resources标签，basename,要以此为基准命名
+<message-resource parameter="MessageResource"/>
+
+2 提供国际化资源文件   baseName+语言+国家.properties
+中文：MessageResource_zh_cn.properties
+英文：MessageResource_en_us.properties
+缺省文件：MessageResource.properties，找不到对应的文件时读取此项文件
+
+3 设置文字 
+MessageResource_zh_cn.properties文件中，采用native2ascii转换成unicode
+user.title=\u7528\u6237\u767b\u5f55
+user.username=\u7528\u6237
+user.password=\u5bc6\u7801
+user.button.login=\u767b\u5f55
+
+MessageResource_en_us.properties文件中
+user.title=User Login
+user.username=User Name
+user.password=Password 
+user.button.login=Login
+
+4 jsp页面引用
+<bean:message key="user.username"/>
+
+5 类中设置
+Locale currentLocale = new Locale("zh", "CN");  //中文
+Locale currentLocale2 = new Locale("en", "US"); //英文
+request.getSession().setAttribute(Globals.LOCALE_KEY, currentLocale);  //设置在SESSION中
+this.setLocale(req, currentLocale2);                                   //调用Action中的setLocale方法
+
+6 动态文本国际化
+
+user.title={0} {1}User Login
+
+<bean:message key="user.name">
+<bean:message key="user.title" arg1="caterpillar" arg2="good morning"/>
+
+ActionMessages mes = new ActionMessages();
+ActionMessage  me = new ActionMessage("user.name",new Object[]{'wade','wade2'});
+mes.add(me);
+saveMeaasges(res,mes);
+
+ActionMessage  me2 = new ActionMessage("user.name",new Object[]{'wade','wade2'});
+mes.add(me2);
+saveErrors(res,mes);
+
+
+
+六、三种常见的标签
+1 html标签
+<html:errors/>
+
+<html:link href="http://www.caterpillar.onlyfun.net/phpBB2"/>
+
+<html:messages id="messages" message="true"> 
+<bean:write name="messages"/> 
+</html:messages>
+
+<html:button property="button1" value="按我" onclick="alert('Hello!World!')" title="Hello!World!"/>
+
+<html:form action="Login" focus="text1" method="POST"> 
+...... 
+<html:form/>
+
+<html:img page="/images/caterpillar.jpg" alt="caterpillar" width="" height="" />
+<html:image property="push" src="push.jpg" onclick="alter("send")"/>
+
+<html:submit value="送出"/> 
+
+<html:reset value="重清"/>
+
+<html:text property="name" size="20"/>
+
+<html:password property="password" size="20"/>
+
+<html:hidden property="hid" value="1234"/> 
+
+<html:textarea property="message" value="在此留言" cols="50" rows="5"/>
+
+<html:radio property="sex" value="man"/>男 
+<html:radio property="sex" value="woman"/>女
+
+<html:checkbox property="lang[0]" value="Java">Java</html:checkbox> 
+<html:checkbox property="lang[1]" value="C#">C#</html:checkbox>
+
+<html:select property="lang" value="Java"> 
+    <html:option value="Java">Java</html:option> 
+    <html:option value="C#">C#</html:option> 
+</html:select>
+
+2 bean标签
+<bean:write name="userForm" property="username"/>
+
+<bean:message key="welcome.title"/> 
+<bean:message key="welcome.greeting" arg1="caterpillar" arg2="good morning"/>
+
+<bean:include id="inc1" page="somepage.jsp"/> 
+
+<bean:define id="hello" value="Hello!World!"/>    
+
+3 logic标签
+<logic:equal name="name" value="wade">
+.....
+</logic:equal>
+
+<logic:notEqual name="name" value="wade">
+.....
+</logic:notEqual>
+
+<logic:greatEqual name="name" value="5">
+.....
+</logic:greatEqual>
+
+<logic:lessEqual name="name" value="5">
+.....
+</logic:lessEqual>
+
+<logic:greatThan name="name" value="5">
+.....
+</logic:greatThan>
+
+<logic:lessThan name="name" value="5">
+.....
+</logic:lessThan
+
+<logic:present scope="request" name="valid_user"> 
+.....
+</logic:present> 
+
+<logic:notPresent scope="request" name="valid_user"> 
+.....
+</logic:notPresent>
+
+<logic:notEmpty name="authors">
+<logic:iterate name="authors" id="author">
+<tr>
+<td height=20 align=left>
+<bean:write property='authorId' name='author'/
+</td>
+<td height=20 align=left>
+<bean:write property="authorName" name="author" />
+</td>
+</tr>
+</logic:iterate>
+</logic:notEmpty>
+
+
+七、动态验证框架及错误处理
+1. 动态验证
+@ struts-config.xml中配置插件       
+    <plug-in className="org.apache.struts.validator.ValidatorPlugIn">  
+        <set-property property="pathnames"  value="/org/apache/struts/validator/validator-rules.xml,/WEB-INF/validation.xml"/>  
+    </plug-in> 
+
+@ 在web-inf目录下建立 validation.xml文件
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE form-validation PUBLIC   
+"-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.3.0//EN"   
+"http://jakarta.apache.org/commons/dtds/validator_1_3_0.dtd">  
+<form-validation>  
+    <formset>   
+        <form name="logonForm">  
+                <!-- depends 设置校验规则 若多个规则， 用逗号隔开  这里 required username必填-->
+                <field property="username" depends="required,maxlength,minlength">        
+  
+                <!-- 用于返回到页面上的校验结果， 如“**必填”  这里在application.properties中找想要显示的对应的文字 --> 
+                <arg key="logonForm.username" />              
+                   
+                <!-- key用表达式取某变量值,name为校验方式,resourse为是否从资源文件中取值 -->  
+                <arg key="${var:maxlength}"  name="maxlength" resource="false"   />   
+                <var>  
+                    <var-name>maxlength</var-name>  
+                    <var-value>10</var-value>  
+                </var>  
+                
+                <arg key="${var:minlength}"  name="minlength" resource="false"   />    
+                <var>  
+                    <var-name>minlength</var-name>  
+                    <var-value>6</var-value>  
+                </var>  
+            </field>  
+               
+            <field property="password" depends="required,mask">  
+                <arg key="logonForm.password" />  
+                <var>  
+                    <var-name>mask</var-name>  
+                    <var-value>^[0-9a-zA-Z]*$</var-value>  
+                </var>  
+            </field>  
+               
+        </form>  
+  
+    </formset>  
+</form-validation> 
+
+public class LogonForm extends ValidatorForm 
+{     
+    private String username;   
+    private String password;   
+    public String getUsername() 
+    {   
+        return username;   
+    }   
+    public void setUsername(String username) 
+    {   
+        this.username = username;   
+    }   
+    public String getPassword() 
+    {   
+        return password;   
+    }   
+    public void setPassword(String password) 
+    {   
+        this.password = password;   
+    }   
+} 
+
+
+2. 错误处理
+@ web.xml配置：
+  <error-page> 
+    <error-code>404</error-code> 
+    <location>/exception/error404.jsp</location> 
+  </error-page> 
+  <error-page> 
+    <error-code>500</error-code> 
+    <location>/exception/error500.jsp</location> 
+  </error-page> 
+  <error-page> 
+    <exception-type>java.lang.Exception</exception-type> 
+    <location>/exception/default.jsp</location> 
+  </error-page> 
+当WEB容器捕获到exception-type或error-code指定的错误时将跳到由location指定的页面。 
+
+@  提示信息和错误信息的发出----------ActionError/ActionErrors/ActionMessage/ActionMessages:  
+   ActionMessage：用于保存一个与资源束对应的提示信息。主要构造函数如：  
+   ActionMessages:用于保存多个ActionMessage。并在html:errors 和html:messages中起作用。 
+   html:messages/html:errors使用property属性访问某个资源 
+   ActionErrors：用于保存一个与资源束对应的错误信息。用法跟ActionMessages差不多。 
+   ActionError不赞成使用。 
+ 
+
+@  AtionErrors和ActionMessages的区别 
+
+& ActionErrors是ActionMessages的一个子类，功能几乎相同，不同点在于标签<html:errors/>和<html:messages>的使用上的区别。 
+html:errors指定了footer和header属性。默认值为errors.header和errors.footer,需要时可以自己指定。如果资源属性文件配置了 errors.header和errors.footer，则任何时候使用html:errors时开头和结尾都是这两个属性对应的资源信息。 
+而html:message默认情况下没有errors.header和errors.footer值，当然可以自己指定。 
+
+& html:errors可以根据property属性指定显示一个错误信息。html:messages有一个必添项id。html:messages不能直接显示信息，它将选出的信息放入一个用id标识的Iterator对象里，然后在用ben:write或JSTL c:out标签显示每个信息.例如： 
+<html:messages message="true" id="msg"> 
+    <c:out value="${msg}"/><br /> 
+</html:messages> 
+
+	                ActionErrors errors = new ActionErrors();
+			ActionMessages ms = new ActionMessages();
+			ms.add("11111", new ActionMessage("error.password"));
+			ms.add("22222", new ActionMessage("error.eerrdf"));
+			errors.add(ms);
+
+
+
+八、Tiles整合
+1  Tiles增加了layout的概念，其实就是把一个页面划分为几块。通常的来说一个页面大概可以划分为如下几块： 　　
+head页面头部：存放一个运用的公共信息：logo等，如果是网站可能是最上面的一块。 　　
+menu页面菜单：放置一个运用中需要使用的菜单，或者在每一个页面都使用的连接。 　　
+footer页面尾部：如版权信息等。 　　
+body页面主题内容：每个页面相对独立的内容。 
+如果按上面的划分那对每一个页面我们只要写body里面的内容，其他的就可以共享重用。 　　
+如果大多数页面的布局基本相同我们甚至可以使用一个jsp文件根据不同的参数调用不同的body。
+
+2 在struts-config.xml中配置信息
+<plug-in className="org.apache.struts.tiles.TilesPlugin" > 
+    <set-property property="definitions-config" value="/WEB-INF/conf/tiles-defs.xml" /> 
+    <set-property property="moduleAware" value="true" /> 
+    <set-property property="definitions-parser-validate" value="true" /> 
+</plug-in>
+
+
+3 tiles-defs.xml设置
+<?xml version="1.0" encoding="ISO-8859-1" ?>                                                            
+<!DOCTYPE tiles-definitions PUBLIC 
+       "-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN" 
+       "http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd"> 
+<tiles-definitions>
+    <definition name=".myLayout" path="/tiles/myLayout.jsp"> 
+        <put name="title"  value="Sample Page Title" /> 
+        <put name="header" value="/tiles/header.jsp" /> 
+        <put name="menu"   value="/tiles/menu.jsp" /> 
+        <put name="footer" value="/tiles/footer.jsp" /> 
+        <put name="body"   value="/tiles/body.jsp" /> 
+    </definition>                                                                   
+</tiles-definitions>
+
+4 页面引用
+<tiles:insert attribute="header"/>
+<tiles:insert attribute="menu"/>
+<tiles:insert attribute="body"/>
+<tiles:insert attribute="footer"/>
+
+5 直接在页面引用，不用配置
+<%@page contentType="text/html; charset=Big5"%> 
+<%@taglib prefix="tiles" uri="/tags/struts-tiles"%> 
+<tiles:insert page="/tiles/myLayout.jsp" flush="true"> 
+    <tiles:put name="title"  value="Tiles範例" /> 
+    <tiles:put name="header" value="/tiles/header.jsp" /> 
+    <tiles:put name="menu"   value="/tiles/menu.jsp" /> 
+    <tiles:put name="footer" value="/tiles/footer.jsp" /> 
+    <tiles:put name="body"   value="/tiles/body.jsp" /> 
+</tiles:insert>
+
+
+
+九、文件的上传
+
+1 页面
+<html:form action="/Upload" method="post" enctype="multipart/form-data"> 
+    選擇檔案:<html:file property="file" /> 
+    <html:submit>上傳</html:submit> 
+</html:form>
+
+2 后台
+public class UploadForm extends ActionForm 
+{ 
+    private FormFile file; 
+                                                                                
+    public void setFile(FormFile file) 
+    { 
+        this.file = file; 
+    } 
+                                                                                
+    public FormFile getFile() 
+    { 
+        return file; 
+    } 
+                                                                                
+    public void reset(ActionMapping mapping, HttpServletRequest req)
+    { 
+        file = null; 
+    } 
+}
+
+
+public class UploadAction extends Action 
+{ 
+    public ActionForward execute(ActionMapping mapping, 
+                                 ActionForm form, 
+                                 HttpServletRequest request, 
+                                 HttpServletResponse response) throws Exception 
+    { 
+        UploadForm fileForm = (UploadForm) form; 
+        FormFile file = fileForm.getFile(); 
+        FileOutputStream fileOutput = new FileOutputStream("/home/caterpillar/files/" + file.getFileName());                                       
+        fileOutput.write(file.getFileData()); 
+        fileOutput.flush(); 
+        fileOutput.close();                                                                
+        return mapping.findForward("success"); 
+    } 
+}
+
+
+
+
+十、Struts1的优缺点
+1 优点
+@ 利用Struts提供的taglib可以大大节约开发时间
+@ 维护扩展比较方便。通过一个配置文件，即可把握整个系统各部分之间的联系，这对于后期的维护有着莫大的好处
+@ 实现MVC模式，结构清晰,使开发者只关注业务逻辑的实现
+@ 表单验证解决了请求数据的验证问题，增强了系统健壮性
+@ 支持国际化I18N,internationalization
+@ 页面导航,通过一个配置文件,即可把握整个系统各部分之间的联系,这对于后期的维护有着莫大的好处。
+
+2 缺点
+@ Struts1 Action是单例模式并且必须是线程安全的，因为仅有Action的一个实例来处理所有的请求。
+@ Struts1 Action 依赖于Servlet API ,因为当一个Action被调用时HttpServletRequest 和 HttpServletResponse 被传递给execute方法
+@ 类型的转换. Struts的FormBean把所有的数据都作为String类型,而且转化的类型是不可配置的。
+@ 测试不方便. Struts的每个Action都同Web层耦合在一起，这样它的测试依赖于Web容器，单元测试也很难实现。
+
+
+
+
+十一、Struts1和Struts2的对比
+
+@ 类:
+Struts1要求Action类继承一个抽象基类。Struts1的一个普遍问题是使用抽象类编程而不是接口。
+Struts 2 Action类可以实现一个Action接口，也可实现其他接口，使可选和定制的服务成为可能。Struts2提供一个ActionSupport基类去实现常用的接口。Action接口不是必须   的，任何有execute标识的POJO对象都可以用作Struts2的Action对象。
+
+@ 线程模式:
+Struts1 Action是单例模式并且必须是线程安全的，因为仅有Action的一个实例来处理所有的请求。单例策略限制了Struts1 Action能作的事，并且要在开发时特别小心。        Action资源必须是线程安全的或同步的。
+Struts2 Action对象为每一个请求产生一个实例，因此没有线程安全问题。（实际上，servlet容器给每个请求产生许多可丢弃的对象，并且不会导致性能和垃圾回收问题）
+
+Servlet 依赖:
+Struts1 Action 依赖于Servlet API ,因为当一个Action被调用时HttpServletRequest 和 HttpServletResponse 被传递给execute方法。
+Struts 2 Action不依赖于容器，允许Action脱离容器单独被测试。如果需要，Struts2 Action仍然可以访问初始的request和response。但是，其他的元素减少或者消除了直接    访问HttpServetRequest 和 HttpServletResponse的必要性。
+
+@ 可测性:
+测试Struts1 Action的一个主要问题是execute方法暴露了servlet API（这使得测试要依赖于容器）。一个第三方扩展－－Struts TestCase－－提供了一套Struts1的模拟对象（来进行测试）。
+Struts 2 Action可以通过初始化、设置属性、调用方法来测试，“依赖注入”支持也使测试更容易。
+
+@ 捕获输入:
+Struts1 使用ActionForm对象捕获输入。所有的ActionForm必须继承一个基类。因为其他JavaBean不能用作ActionForm，开发者经常创建多余的类捕获输入。动态Bean（DynaBeans）可以作为创建传统ActionForm的选择，但是，开发者可能是在重新描述(创建)已经存在的JavaBean（仍然会导致有冗余的javabean）。
+Struts 2直接使用Action属性作为输入属性，消除了对第二个输入对象的需求。输入属性可能是有自己(子)属性的rich对象类型。Action属性能够通过 web页面上的taglibs访问。Struts2也支持ActionForm模式。rich对象类型，包括业务对象，能够用作输入/输出对象。这种 ModelDriven 特性简化了taglib对POJO输入对象的引用。
+
+@ 表达式语言：
+Struts1 整合了JSTL，因此使用JSTL EL。这种EL有基本对象图遍历，但是对集合和索引属性的支持很弱。
+Struts2可以使用JSTL，但是也支持一个更强大和灵活的表达式语言－－"Object Graph Notation Language" (OGNL).
+
+@ 绑定值到页面（view）:
+Struts 1使用标准JSP机制把对象绑定到页面中来访问。
+Struts 2 使用 "ValueStack"技术，使taglib能够访问值而不需要把你的页面（view）和对象绑定起来。ValueStack策略允许通过一系列名称相同但类型不同的属性重用页面（view）。
+
+@ 类型转换：
+Struts 1 ActionForm 属性通常都是String类型。Struts1使用Commons-Beanutils进行类型转换。每个类一个转换器，对每一个实例来说是不可配置的。
+Struts2 使用OGNL进行类型转换。提供基本和常用对象的转换器。
+
+@ 校验：
+Struts 1支持在ActionForm的validate方法中手动校验，或者通过Commons Validator的扩展来校验。同一个类可以有不同的校验内容，但不能校验子对象。
+Struts2支持通过validate方法和XWork校验框架来进行校验。XWork校验框架使用为属性类类型定义的校验和内容校验，来支持chain校验子属性
+
+@ Action执行的控制：
+Struts1支持每一个模块有单独的Request Processors（生命周期），但是模块中的所有Action必须共享相同的生命周期。
+Struts2支持通过拦截器堆栈（Interceptor Stacks）为每一个Action创建不同的生命周期。堆栈能够根据需要和不同的Action一起使用。
+
+

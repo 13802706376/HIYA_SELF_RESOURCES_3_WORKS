@@ -1,0 +1,61 @@
+组件-----对话框、窗口、面板、多选项面板、viewport面板、表格、可编辑表格、树形、   
+控件-----拖拽、可调大小、日期、   
+  
+  
+  
+  
+jquery-ui的用法：   
+  
+<script language="javascript"  src="jquery-ui-1.js"></script>   
+<link href="jquery-ui-themes.css" rel="stylesheet" type="text/css"/>   
+  
+<div  id="dragDiv" style="text-align:center;border:1px solid #dcdcdc;width:400px;height:205px;padding-top:6px) ">   
+<p> </p>   
+大家好，我是可以被拖拽的窗体！   
+</div>   
+<div  id="dragDiv2" style="text-align:center;border:1px solid #dcdcdc;width:400px;height:205px;padding-top:6px) ">   
+<p> </p>   
+大家好，我是拖拽触发的事件！   
+</div>   
+  //使窗体拖拽   
+  $("#dragDiv").draggable();               
+     
+  //拖到某标签事件   
+   $("#dragDiv2").droppable   
+   ({         
+        //accept: "#dragDiv",         
+        //activeClass: 'droppable-active',         
+        //hoverClass: 'droppable-hover',         
+        drop: function(ev, ui)    
+        {         
+            $(this).append("又撞到了我一下  。。。");         
+         }         
+  });         
+  
+  
+//日历控件   
+ function showDatepicker(obj)   
+ {   
+      $(obj).datepicker();   
+ }   
+  
+/排序的文件   
+$("#myList").sortable({});   
+  
+//改变大小   
+$(”#example”).resizable();      
+  
+//折叠菜单   
+$(”#example”).accordion();        
+  
+//打开对话框   
+$("#example").dialog();    
+  
+//sliders滑动条   
+$("#example").slider();   
+  
+//表格排序   
+$("#example").tablesorter({sortList:[[0,0],[2,1]], widgets: ['zebra']});    
+  
+//tab页标签   
+$("#example > ul").tabs();   

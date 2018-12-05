@@ -1,0 +1,46 @@
+function getPaginationTag(totalRows,currentPage,totalPages,lan)   
+{   
+        var pageFrontCn = "总共:"+totalRows+"  页码:"+currentPage+"/"+totalPages;    
+        var pageFrontEn = "Total:"+totalRows+" Page:"+currentPage+"/"+totalPages;    
+        var isEn = "en"==lan;   
+        var  siglePageSpan = isEn?"<span style='text-align:center;margin-right:15px;'>"+pageFrontEn+"</span> "  
+                                              :"<span style='text-align:center;margin-right:15px;'>"+pageFrontCn+"</span> ";   
+        var prePage = isEn?"Prex":"上一页";   
+        var nextPage = isEn?"Next":"下一页";   
+        var  siglePage = currentPage==1?siglePageSpan+"<a style='color:#dcdcdc;'>"+prePage+"</a>"  
+                                                         :siglePageSpan+ "<a href=\"javascript:goPage('prev')\">"+prePage+"</a>";   
+          var selectPage = " <select onchange='goPage(this)' style='border:1px solid red;background-color:#dcdcdc;'>";   
+          for(var i=1;i<=totalPages;i++)   
+          {   
+               if(i==currentPage)   
+               {   
+                     selectPage+="<option value='"+i+"' selected>"+i+"</option>";   
+                     siglePage+="<strong>"+i+"</strong>";   
+               }   
+               else if(i==1||i==2||i==currentPage-1||i==currentPage-2||i==currentPage+1   
+                       ||i==currentPage+2||i==totalPages||i==totalPages-1)   
+               {   
+                       selectPage+="<option value='"+i+"'>"+i+"</option>";                      
+                       if(i==currentPage-2&&i>3)   
+                       {   
+                             siglePage+="... "+"<a href='javascript:goPage("+i+")'>"+i+"</a>";   
+                       }   
+                       else if(i==currentPage+2&&i<totalPages-2)   
+                       {   
+                             siglePage+="<a href='javascript:goPage("+i+")'>"+i+"</a>"+" "+"...";   
+                       }   
+                       else  
+                       {   
+                           siglePage+="<a href='javascript:goPage("+i+")'>"+i+"</a>";   
+                       }   
+               }   
+               else  
+               {   
+                    selectPage+="<option value='"+i+"'>"+i+"</option>";   
+               }   
+          }   
+          siglePage = currentPage==totalPages?siglePage+"<a style='color:#dcdcdc;'>"+nextPage+"</a>"  
+                                                                  :siglePage+"<a href=\"javascript:goPage('next')\">"+nextPage+"</a>";   
+          selectPage+="</select>";   
+         return siglePage+selectPage;   
+}  

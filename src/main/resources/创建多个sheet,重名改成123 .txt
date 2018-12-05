@@ -1,0 +1,36 @@
+    String operateNameArr[] ={"¸ü»»","IT","IT8","IT","IT8","ERTRE","IT8"};   
+    List<String> list = new ArrayList<String>();   
+    Map<String,Integer> map = new HashMap<String,Integer>();   
+    if(null!=operateNameArr&&operateNameArr.length>0)   
+    {   
+        for(int k=0;k<operateNameArr.length;k++)   
+        {   
+             list.add(operateNameArr[k]);   
+             Integer index55 = getCount(list,operateNameArr[k]);   
+               if(index55.intValue()>1)   
+               {   
+                  map.put(operateNameArr[k],index55);   
+               }   
+        }   
+    }   
+       
+    System.out.println("map=="+map);   
+    for(int k=0;k<operateNameArr.length;k++)   
+    {   
+               if(map.containsKey(operateNameArr[k]))   
+               {   
+                   Integer pp = map.get(operateNameArr[k]).intValue();   
+                   Integer pp2 = new Integer(pp.intValue()-1);   
+                   map.remove(operateNameArr[k]);   
+                   map.put(operateNameArr[k], pp2);   
+                   operateNameArr[k] = operateNameArr[k]+"("+pp+")";   
+                      
+                     
+               }   
+    }   
+       
+    for(int k=0;k<operateNameArr.length;k++)   
+    {   
+       
+    System.out.print(operateNameArr[k]+";");   
+    }  

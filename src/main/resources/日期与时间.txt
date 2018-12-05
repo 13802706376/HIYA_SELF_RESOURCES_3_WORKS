@@ -1,0 +1,751 @@
+
+
+package com.umt.czj;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+/**
+ * @author caozhijun
+ *  1.计算出在开始日期和结束日期之间跨越的所有天数。
+ *  如：开始日期为2003－12-01，结束日期为2004－01－04。输出为34 
+ *  2.计算出在开始日期和结束日期之间跨越的所有月份。
+ *  如：开始日期为2003－12-01，结束日期为2004－02－01。输出为200312,200401,200402
+ *  3.计算出在一段时间之后的日期， 如开始日期为2010-10-29，过了34天后是2010-12-02
+ */
+public class WadeAndMcGrady
+{
+    // 封装平年的月份和对应的天数
+    Map<String, String> map_p = new HashMap<String, String>();
+    
+    // 封装闰年的月份和对应的天数
+    Map<String, String> map_r = new HashMap<String, String>();
+    
+    // 平年的天数
+    public static final int TOTALDAYS_P = 365;
+    
+    // 闰年的天数
+    public static final int TOTALDAYS_R = 366;
+    
+    // 天数结果
+    public Integer DaysFinally = null;
+    
+    // 月份集合
+    public List<String> MonthsFinally = new ArrayList<String>();
+    
+    // 最终日期
+    public String EndDateFinally = null;
+    
+    // 开始日期
+    public String dateStart = null;
+    
+    // 结束日期
+    public String dateEnd = null;
+    
+    // 经过的天数
+    public Long days = null;
+    
+    // 起始年份字符串形式
+    public String startYearString = null;
+    
+    // 起始月份字符串形式
+    public String startMonthString = null;
+    
+    // 起始日字符串形式
+    public String startDayString = null;
+    
+    // 起始年份整数形式
+    public Integer startYearInt = null;
+    
+    // 起始月份整数串形式
+    public Integer startMonthInt = null;
+    
+    // 起始日整数形式
+    public Integer startDayInt = null;
+    
+    // 结束年份字符串形式
+    public String endYearString = null;
+    
+    // 结束月份字符串形式
+    public String endMonthString = null;
+    
+    // 结束日字符串形式
+    public String endDayString = null;
+    
+    // 结束年份整数形式
+    public Integer endYearInt = null;
+    
+    // 结束月份整数形式
+    public Integer endMonthInt = null;
+    
+    // 结束月份整数形式
+    public Integer endDayInt = null;
+    
+    // 输入的起始时间格式不正确
+    public static final String DATESTARTNOTCORRENT = "The fomart of input dateStart is not correct! ";
+    
+    // 输入的结束时间格式不正确
+    public static final String DATEENDNOTCORRENT = "The fomart of input dateEnd is not correct! ";
+    
+    // 输入的天数格式不正确
+    public static final String DAYSNOTCORRENT = "The fomart of input days is not correct! ";
+    
+    // 输入的起始时间或结束时间格式不正确
+    public static final String DATESTARTORENDNOTCORRENT = "The fomart of input dateStart or dateEnd is not correct! ";
+    
+    // 输入的起始时间必须比结束时间早
+    public static final String DATESTARTBIGGERTHANEND = "the dateEnd must be later than dateStart!";
+    
+    /**
+     * main方法
+     * 调用业务逻辑
+     */
+    public static void main(String[] args)
+    {
+        // 实例化对象
+        WadeAndMcGrady wade = new WadeAndMcGrady();
+        
+        // 初始化参数
+        wade.initData();
+        
+        // 输入参数效验
+        wade.doValidate();
+        
+        // 整理业务数据
+        wade.tidyBusinessData();
+        
+        // 调用业务逻辑处理
+        wade.doBusiness();
+        
+        // 后业务处理
+        wade.doAfterBusiness();
+        
+    }
+    
+    /**
+     *  初始化输入参数或变量
+     */
+    public void initData()
+    {
+        // 初始化参数
+        System.out.println("请输入开始日期：");
+        Scanner sca = new Scanner(System.in);
+        
+        dateStart = sca.next();
+        System.out.println("请输入结束日期：");
+        
+        dateEnd = sca.next();
+        System.out.println("请输入经过的天数：");
+        try
+        {
+            days = new Long(sca.next());
+        }
+        catch (Exception ex)
+        {
+            // 如果输入不是数字，天数为null
+            days = null;
+            ex.printStackTrace();
+        }
+        
+        // 实例化平年的月份对应的天数
+        map_p.put("1", "31");
+        map_p.put("2", "28");
+        map_p.put("3", "31");
+        map_p.put("4", "30");
+        map_p.put("5", "31");
+        map_p.put("6", "30");
+        map_p.put("7", "31");
+        map_p.put("8", "31");
+        map_p.put("9", "30");
+        map_p.put("10", "31");
+        map_p.put("11", "30");
+        map_p.put("12", "31");
+        map_p.put("13", "365");
+        
+        // 实例化闰年的月份对应的天数
+        map_r.put("1", "31");
+        map_r.put("2", "29");
+        map_r.put("3", "31");
+        map_r.put("4", "30");
+        map_r.put("5", "31");
+        map_r.put("6", "30");
+        map_r.put("7", "31");
+        map_r.put("8", "31");
+        map_r.put("9", "30");
+        map_r.put("10", "31");
+        map_r.put("11", "30");
+        map_r.put("12", "31");
+        map_r.put("13", "366");
+        
+    }
+    
+    /**
+     *  效验输入的参数格式
+     */
+    public void doValidate()
+    {
+        try
+        {
+            // 效验输入的初始时间
+            String start[] = dateStart.split("\\-");
+            String year1 = start[0];
+            String month1 = start[1];
+            String day1 = start[2];
+            
+            if (!validateYMD(year1, month1, day1))
+            {
+                throw new RuntimeException(DATESTARTNOTCORRENT);
+            }
+            
+            // 起始时间年月日赋值
+            startYearString = year1;
+            startMonthString = month1;
+            startDayString = day1;
+            
+            startYearInt = Integer.parseInt(startYearString);
+            startMonthInt = Integer.parseInt(startMonthString.indexOf("0") == 0 ? startMonthString.substring(1,
+                    2)
+                    : startMonthString);
+            startDayInt = Integer.parseInt(startDayString.indexOf("0") == 0 ? startDayString.substring(1,
+                    2)
+                    : startDayString);
+            
+            // 效验输入的结束时间
+            String end[] = dateEnd.split("\\-");
+            String year2 = end[0];
+            String month2 = end[1];
+            String day2 = end[2];
+            
+            if (!validateYMD(year2, month2, day2))
+            {
+                throw new RuntimeException(DATEENDNOTCORRENT);
+            }
+            
+            // 结束时间年月日赋值
+            endYearString = year2;
+            endMonthString = month2;
+            endDayString = day2;
+            
+            endYearInt = Integer.parseInt(endYearString);
+            endMonthInt = Integer.parseInt(endMonthString.indexOf("0") == 0 ? endMonthString.substring(1,
+                    2)
+                    : endMonthString);
+            endDayInt = Integer.parseInt(endDayString.indexOf("0") == 0 ? endDayString.substring(1,
+                    2)
+                    : endDayString);
+            
+            // 效验输入的天数
+            if (days == null || !days.toString().matches("\\d+")
+                    || days.toString().indexOf("0") == 0)
+            {
+                throw new RuntimeException(DAYSNOTCORRENT);
+            }
+            
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            throw new RuntimeException(DATESTARTORENDNOTCORRENT, ex);
+        }
+        
+    }
+    
+    /**
+     * 业务逻辑处理
+     */
+    public void doBusiness()
+    {
+        
+        // 得到跨越的天数并初始化月份集合
+        Long DaysFinally = getDaysAndMonths();
+        
+        // 得到结束日期
+        String EndDateFinally = getEndDate();
+        
+        // 打印出结果
+        System.out.println("" +
+                "1.开始日期为" + dateStart + "，" +
+                  "结束日期为" + dateEnd + "，" + 
+                  "跨越的天数为：" + DaysFinally + "天！！");
+        System.out.println();
+        
+        System.out.println("" +
+                "2.开始日期为" + dateStart + "，" + 
+                  "结束日期为" + dateEnd+ "，" + 
+                  "所有的月份如下所示：");
+        
+        for (int i = 0; i < MonthsFinally.size(); i++)
+        {
+            System.out.println(MonthsFinally.get(i) + "");
+        }
+        System.out.println();
+        
+        System.out.println("" + 
+                "3.开始日期为" + dateStart + "，" + 
+                  "过了" + days + 
+                  "天后的日期是：" + EndDateFinally + "！");
+        
+    }
+    
+    /**
+     * 计算出在开始日期和结束日期之间 
+     * 1.返回跨越的所有天数的逻辑 
+     * 2.初始化全局变量MonthsFinally的值
+     */
+    public Long getDaysAndMonths()
+    {
+        // 年份的差距表现
+        int space_year = endYearInt - startYearInt;
+        
+        //起始年map
+        Map<String, String> mapStart = null;
+        
+        //结束年map
+        Map<String, String> mapEnd = null;
+        
+        // 月份的差距表现
+        String tempMonth = startMonthString;
+        
+        startMonthString = startMonthString.indexOf("0") == 0 ? startMonthString.substring(1,
+                2): startMonthString;
+        
+        String tempMonth2 = endMonthString;
+        
+        endMonthString = endMonthString.indexOf("0") == 0 ? endMonthString.substring(1,
+                2): endMonthString;
+        
+        int space_month = endMonthInt - startMonthInt;
+        
+        // 天数的差距表现
+        startDayString = startDayString.indexOf("0") == 0 ? startDayString.substring(1,
+                2): startDayString;
+        
+        endDayString = endDayString.indexOf("0") == 0 ? endDayString.substring(1,
+                2): endDayString;
+        Long space_day = new Long(endDayInt - startDayInt);
+        
+        // map1和map2的取值
+        
+        mapStart = isRunYear(startYearInt) ? map_r : map_p;
+        mapEnd = isRunYear(endYearInt) ? map_r : map_p;
+        
+        /** 异常情况 */
+        if (space_year < 0)
+        {
+            throw new RuntimeException(DATESTARTBIGGERTHANEND);
+        }
+        
+        /** 同一年 */
+        else if (space_year == 0)
+        {
+            // 同一年，月份的异常情况
+            if (space_month < 0)
+            {
+                throw new RuntimeException(DATESTARTBIGGERTHANEND);
+            }
+            
+            // 同一年同一月
+            else if (space_month == 0)
+            {
+                MonthsFinally.add(startYearString + tempMonth);
+                return space_day;
+                
+            }
+            
+            // 同一年相差一月
+            else if (space_month == 1)
+            {
+                MonthsFinally.add(startYearString + tempMonth);
+                MonthsFinally.add(endYearString + tempMonth2);
+                return (Long.parseLong(mapStart.get(startMonthString)) - startDayInt)
+                        + endDayInt;
+                
+            }
+            
+            // 同一年相差>1月
+            else
+            {
+                int temp1 = 0;
+                MonthsFinally.add(startYearString + tempMonth);
+                for (int i = 1; i < space_month; i++)
+                {
+                    String str = "";
+                    str = startMonthInt + i < 10 ? "0"
+                            + new Integer(startMonthInt + i).toString()
+                            : new Integer(startMonthInt + i).toString();
+                    MonthsFinally.add(startYearString + str);
+                    int temp2 = Integer.parseInt(mapStart.get(new Integer(
+                            startMonthInt + i).toString()));
+                    temp1 += temp2;
+                }
+                
+                MonthsFinally.add(startYearString + tempMonth2);
+                return new Long(temp1
+                        + (Integer.parseInt(mapStart.get(startMonthString)) - startDayInt)
+                        + endDayInt);
+            }
+            
+        }
+        
+        /** 相差一年 */
+        else if (space_year == 1)
+        {
+            // 起始年的天数和月份
+            int temp1 = 0;
+            MonthsFinally.add(startYearString + tempMonth);
+            for (int i = 1; i <= 12 - startMonthInt; i++)
+            {
+                String str = "";
+                str = startMonthInt + i < 10 ? "0"
+                        + new Integer(startMonthInt + i).toString()
+                        : new Integer(startMonthInt + i).toString();
+                MonthsFinally.add(startYearString + str);
+                int temp11 = Integer.parseInt(mapStart.get(new Integer(
+                        startMonthInt + i).toString()));
+                temp1 += temp11;
+            }
+            
+            // 结束年的天数和月份
+            int temp2 = 0;
+            for (int i = 1; i < endMonthInt; i++)
+            {
+                String str = "";
+                str = i < 10 ? "0" + new Integer(i).toString()
+                        : new Integer(i).toString();
+                MonthsFinally.add(endYearString + str);
+                int temp22 = Integer.parseInt(mapEnd.get(new Integer(i).toString()));
+                temp2 += temp22;
+            }
+            MonthsFinally.add(endYearString + tempMonth2);
+            
+            // 返回两者之和
+            return new Long(temp1 + temp2);
+        }
+        
+        /** 相差>1年 */
+        else
+        {
+            // 起始年的天数和月份
+            MonthsFinally.add(startYearString + tempMonth);
+            int temp1 = 0;
+            for (int i = 1; i <= 12 - startMonthInt; i++)
+            {
+                String str = "";
+                str = startMonthInt + i < 10 ? "0"
+                        + new Integer(startMonthInt + i).toString()
+                        : new Integer(startMonthInt + i).toString();
+                MonthsFinally.add(startYearString + str);
+                int temp11 = Integer.parseInt(mapStart.get(new Integer(
+                        startMonthInt + i).toString()));
+                temp1 += temp11;
+            }
+            
+            temp1 += Integer.parseInt(mapStart.get(new Integer(startMonthInt).toString()))
+                    - startDayInt;
+            
+            // 中间相隔年的天数和月份
+            int tempn = 0;
+            for (int i = 1; i < space_year; i++)
+            {
+                int tempn2 = isRunYear(startYearInt + i) ? TOTALDAYS_R
+                        : TOTALDAYS_P;
+                for (int j = 1; j <= 12; j++)
+                {
+                    String str = "";
+                    str = j < 10 ? "0" + new Integer(j).toString()
+                            : new Integer(j).toString();
+                    MonthsFinally.add(new Integer(startYearInt + i).toString()
+                            + str);
+                }
+                tempn += tempn2;
+            }
+            
+            // 结束年的天数和月份
+            int temp2 = 0;
+            for (int i = 1; i < endMonthInt; i++)
+            {
+                String str = "";
+                str = i < 10 ? "0"
+                        + new Integer(i).toString()
+                        : new Integer(i).toString();
+                MonthsFinally.add(endYearString + str);
+                int temp22 = Integer.parseInt(mapEnd.get(new Integer(i).toString()));
+                temp2 += temp22;
+            }
+            temp2 += endDayInt;
+            MonthsFinally.add(endYearString + tempMonth2);
+            
+            // 返回三者之和
+            return new Long(tempn + temp1 + temp2);
+        }
+    }
+    
+    /**
+     * 计算出在一段时间之后的日期
+     * 
+     * @param 
+     */
+    public String getEndDate()
+    {
+        Long sum = new Long(startDayInt + days);
+        String sumDay = sum < 10 ? "0" + sum.toString() : sum.toString();
+        String sumMonth = Integer.parseInt(startMonthString) < 10 ? "0"
+                + startMonthString : startMonthString;
+        Map<String, String> map = null;
+        map = isRunYear(startYearInt) ? map_r : map_p;
+        
+        int temp = Integer.parseInt(map.get(new Integer(startMonthInt).toString()))
+                - startDayInt;
+        
+        int temp1 = 0;
+        Long temp55 = sum - temp - startDayInt;
+        for (int i = 1; i <= 12 - startMonthInt; i++)
+        {
+            int temp11 = Integer.parseInt(map.get(new Integer(startMonthInt + i).toString()));
+            temp1 += temp11;
+        }
+        
+        //本月之内
+        if (sum <= Integer.parseInt(map.get(new Integer(startMonthInt).toString())))
+        {
+            return startYearString + "-" + sumMonth + "-" + sumDay;
+        }
+        
+        //本年之内
+        else if (sum > Integer.parseInt(map.get(new Integer(startMonthInt).toString()))
+                && sum <= temp + temp1)
+        {
+            int temp9 = 0;
+            Long temp10 = 0L;
+            for (int i = 1; i <= 12 - startMonthInt; i++)
+            {
+                int temp7 = Integer.parseInt(map.get(new Integer(startMonthInt
+                        + i).toString()));
+                if (temp55 - temp7 > 0)
+                {
+                    temp55 -= temp7;
+                }
+                else
+                {
+                    temp9 = startMonthInt + i;
+                    temp10 = temp55;
+                    break;
+                }
+                
+            }
+            String temp11 = temp9 < 10 ? "0" + new Integer(temp9).toString()
+                    : new Integer(temp9).toString();
+            String temp12 = temp10 < 10 ? "0" + temp10.toString()
+                    : temp10.toString();
+            return startYearString + "-" + temp11 + "-" + temp12;
+            
+        }
+        
+        //不是本年
+        else
+        {
+            int nextYear = startYearInt + 1;
+            map = isRunYear(nextYear) ? map_r : map_p;
+            Long nextDays = new Long(days - temp - temp1);
+            int temp13 = 0;
+            Long temp14 = 0L;
+            
+            //下一年
+            if (nextDays <= Integer.parseInt(map.get("13")))
+            {
+                for (int i = 1; i <= 12; i++)
+                {
+                    int temp15 = Integer.parseInt(map.get(new Integer(i).toString()));
+                    if (nextDays - temp15 > 0)
+                    {
+                        nextDays -= temp15;
+                    }
+                    else
+                    {
+                        temp13 = i;
+                        temp14 = nextDays;
+                        break;
+                    }
+                    
+                }
+                
+                String temp16 = temp13 < 10 ? "0"
+                        + new Integer(temp13).toString()
+                        : new Integer(temp13).toString();
+                String temp17 = temp14 < 10 ? "0" + temp14.toString()
+                        : temp14.toString();
+                return startYearInt + 1 + "-" + temp16 + "-" + temp17;
+                
+            }
+            
+            //过了>1年
+            else
+            {
+                int temp17 = 0;
+                Long temp18 = 0L;
+                
+                for (int i = 1;; i++)
+                {
+                    map = isRunYear(startYearInt + i) ? map_r : map_p;
+                    int temp16 = Integer.parseInt(map.get("13"));
+                    if (nextDays - temp16 > 0)
+                    {
+                        nextDays = nextDays - temp16;
+                    }
+                    else
+                    {
+                        temp17 = i;
+                        temp18 = nextDays;
+                        break;
+                    }
+                    
+                }
+                
+                int nextYear2 = startYearInt + temp17;
+                map = isRunYear(nextYear2) ? map_r : map_p;
+                Long nextDays2 = temp18;
+                int temp19 = 0;
+                Long temp20 = 0L;
+                
+                for (int i = 1; i <= 12; i++)
+                {
+                    int temp23 = Integer.parseInt(map.get(new Integer(i).toString()));
+                    if (nextDays2 - temp23 > 0)
+                    {
+                        nextDays2 = nextDays2 - temp23;
+                    }
+                    else
+                    {
+                        temp19 = i;
+                        temp20 = nextDays2;
+                        break;
+                    }
+                    
+                }
+                
+                String temp21 = temp19 < 10 ? "0"
+                        + new Integer(temp19).toString()
+                        : new Integer(temp19).toString();
+                String temp22 = temp20 < 10 ? "0" + temp20.toString()
+                        : temp20.toString();
+                return nextYear2 + "-" + temp21 + "-" + temp22;
+                
+            }
+            
+        }
+        
+    }
+    
+    /**
+     * 判断本年是否为闰年
+     * 
+     * @param year
+     * @return [参数说明]
+     */
+    public boolean isRunYear(int yearInt)
+    {
+        
+        if (yearInt % 4 == 0 && yearInt % 100 == 0 && yearInt % 400 != 0)
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * 效验年、月、日格式的主要逻辑
+     * 
+     * @param year
+     */
+    public boolean validateYMD(String year, String month, String day)
+    {
+        try
+        {
+            // 年份、月份、天数必须是数字组成
+            if (!year.matches("\\d+") || !month.matches("\\d+")
+                    || !day.matches("\\d+"))
+            {
+                return false;
+            }
+            
+            // 年份必须在1000和5000之间
+            int yearInt = Integer.parseInt(year);
+            if (yearInt <1000 || yearInt >5000)
+            {
+                return false;
+            }
+            
+            // 月份必须在1和12之间
+            month = month.indexOf("0") == 0 && month.length() == 2?month.substring(1, 2):month;
+            int monthInt = Integer.parseInt(month);
+            if (monthInt < 1 || monthInt > 12)
+            {
+                return false;
+            }
+            
+            // 天数必须在1和31之间
+            if (day.indexOf("0") == 0 && day.length() == 2)
+            {
+                day = day.substring(1, 2);
+            }
+            int dayInt = Integer.parseInt(day);
+            if (dayInt < 1 || dayInt > 31)
+            {
+                return false;
+            }
+            
+            // 判断平年的2月份格式
+            if (isRunYear(Integer.parseInt(year)) && monthInt == 2)
+            {
+                if (dayInt > 29)
+                {
+                    return false;
+                }
+            }
+            
+            // 判断闰年的2月份格式
+            if (!isRunYear(Integer.parseInt(year)) && monthInt == 2)
+            {
+                if (dayInt > 28)
+                {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
+        
+    }
+    
+    /**
+     * 后业务处理 
+     * 发送消息到NBA
+     */
+    public void doAfterBusiness()
+    {
+        // 本版本不实现
+    }
+    
+    /**
+     * 整理业务数据
+     */
+    public void tidyBusinessData()
+    {
+        // 本版本不实现
+    }
+    
+}
+
+
+ 
+
+ 
+

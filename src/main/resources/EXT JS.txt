@@ -1,0 +1,612 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<TITLE>EXTJS练习</TITLE>
+</HEAD>
+<link rel="stylesheet" type="text/css" href="extjs/resources/css/ext-all.css"/>
+<script language="javascript"  src="extjs/adapter/ext/ext-base.js"></script>
+<script language="javascript"  src="extjs/ext-all.js"></script>
+ <BODY>
+<div style="margin:5px 15px 5px 15px;width:100%;height:2000px;" >
+ <p> <p/> 
+ <p> <p/> 
+<table style="width:100%;border-width:1px;border-color:blue;" >
+<tr>
+<td><input type="button" value="模态窗口" onclick="openWindow()"></td>
+<td><input type="button" value="不能关闭的模态窗口" onclick="openWindowNoClose()"></td>
+<td><input type="button" value="面     板" onclick="openPanel()"></td>
+<td><input type="button" value="column布局" onclick="openPanelLayout()"></td>
+<td><input type="button" value="form布局" onclick="openPanelForm()"></td>
+</tr>
+<tr>
+<td><input type="button" value="Accordion布局" onclick="openPanelAccordion()"></td>
+<td><input type="button" value="Table布局" onclick="openPanelTable()"></td>
+<td><input type="button" value="面     板" onclick="openPanel()"></td>
+<td><input type="button" value="可编辑表格" onclick="openEditorGridPanel()"></td>
+<td> <input type="button" value="树形控件" onclick="openTreePanel()"></td>
+</tr>
+<tr>
+<td><input type="button" value="选项面板" onclick="openTabPanel()"></td>
+<td><input type="button" value="点击事件"  id="clickId"></td>
+<td><input type="button" value="点击事件延迟"  id="clickIdDelay"></td>
+<td><input type="button" value="viewPort效果"  onclick="showViewPort()"></td>
+<td><input type="button" value="后台管理系统"  onclick="showManagerView()"></td>
+</tr>
+<tr>
+<td><input type="button" value="component属性"  onclick="showComponentAttr()"></td>
+<td><button id="mb1">确认框弹出来</button></td>
+<td><button id="mb2">输入text再确认</button></td>
+<td><button id="mb3">输入textArea再确认</button></td>
+<td><button id="mb4">Yes/No/Cancel</button></td>
+</tr>
+<tr>
+<td><input type="button" value="component属性"  onclick="showComponentAttr()"></td>
+<td><button id="mb6"> 进度条</button></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<div id="panelDiv"></div><br><br>   
+  <div id="accordionDiv"></div><br><br>   
+  <div id="treeDiv"></div><br><br>   
+  <div id="formDiv"></div> <br><br>   
+  <div id="GridPanelDiv"></div> <br><br>   
+  <div id="EditorGridPanelDiv"></div><br><br>   
+  <div id="TableDiv"></div><br><br>   
+  <div id="compocontDiv"></div><br><br>   
+  <div id="tabPanelDiv"></div>   
+  </div>   
+   <select id="positionDiv">   
+  <option>小前锋</option>   
+  <option>大前锋</option>   
+  <option>中锋</option>   
+  <option>得分后卫</option>   
+  <option>组织后卫</option>   
+  </select>   
+  
+  
+  <script language="javascript">   
+showComponentAttr();   
+function showComponentAttr()   
+{   
+      new Ext.Panel(   
+      {   
+              allowDomMove:true,   
+               renderTo:"compocontDiv",   
+               title:"compocont属性",   
+               width:800,   
+               height:500,   
+               html:"<p style='text-align:center;margin-top:20px;font-weight:700;font-family:arial;color:red;'>大家好，我是总决赛MVP、全明星MVP、最佳阵容一队、全明星技巧大赛冠军、得分王德维恩-韦德！</p>",   
+               tools:    
+               [{ id:"save"},   
+               {id:"help",handler:function (){Ext.MessageBox.alert("help","帮助信息请查看http://www.bangzhu.com");}},   
+               { id:"close",handler:function (){Ext.MessageBox.alert("close","关闭窗口请查看http://www.guanbi.com");}} ],   
+               tbar:[{text:'顶部工具栏'},{pressed:false,text:'刷新'}],   
+               bbar:[{text:'底部工具栏'}],   
+               buttons:[{text:'按钮1'},{text:'按钮2'}]   
+      }   
+      );   
+}   
+    Ext.onReady(function ()   
+    {   
+           //Ext.MessageBox.alert("","欢迎光临，韦德先生！");   
+           Ext.get("clickId").addListener("click",function (){alert("监控！");});   
+           Ext.get("clickIdDelay").on("click",function (){alert("监控！");},this,{delay:2000});   
+           Ext.get('mb1').on('click', function(e)   
+            {   
+                 Ext.MessageBox.confirm('确认框', '你真的想跳，考虑清楚啦?', function (btn)   
+                 {   
+                      Ext.MessageBox.alert('',btn);   
+                 });   
+            });  
+
+Ext.get('mb2').on('click', function(e)   
+{   
+           Ext.MessageBox.prompt('姓名', '请输入姓名:', function (btn,text)   
+        {   
+              Ext.MessageBox.alert('',btn+"："+text);   
+        });   
+   });   
+  
+   Ext.get('mb3').on('click', function(e){   
+       Ext.MessageBox.show({   
+          title: '地址',   
+          msg: '请输入地址:',   
+          width:300,   
+          buttons: Ext.MessageBox.OKCANCEL,   
+          multiline: true,   
+          fn: function (btn,text)   
+        {   
+              Ext.MessageBox.alert('',btn+"："+text);   
+        },   
+          animEl: 'mb3'  
+      });   
+   });   
+  
+   Ext.get('mb4').on('click', function(e){   
+       Ext.MessageBox.show({   
+          title:'保存修改',   
+          msg: '你已经修改了你的生日信息. <br />确认要修改吗?',   
+          buttons: Ext.MessageBox.YESNOCANCEL,   
+          fn: function (btn)   
+             {   
+                  Ext.MessageBox.alert('',btn);   
+             },   
+          animEl: 'mb4',   
+          icon: Ext.MessageBox.QUESTION   
+      });   
+   });   
+  
+  
+   Ext.get('mb6').on('click', function(){   
+       Ext.MessageBox.show({   
+          title: '请稍等',   
+          msg: '正在处理...',   
+          progressText: 'Initializing...',   
+          width:300,   
+          progress:true,   
+          closable:false,   
+          animEl: 'mb6'  
+      });   
+      var f = function(v)   
+   {   
+           return function(){   
+               if(v == 12){   
+                   Ext.MessageBox.hide();   
+                   Ext.MessageBox.alert('','加载已完成');   
+               }else{   
+                   var i = v/11;   
+                   Ext.MessageBox.updateProgress(i, Math.round(100*i)+'% completed');   
+               }   
+          };   
+      };   
+      for(var i = 1; i < 13; i++){   
+          setTimeout(f(i), i*500);   
+      }   
+   });   
+     
+});  
+function showViewPort()   
+   {   
+        new Ext.Viewport(   
+        {   
+            enableTabScroll:true,   
+            layout:'fit',   
+            items:[{title:'viewPort',html:'韦德+詹姆斯+波什=总冠军 ',bbar:[{text:'我的待办'},{text:'我的工作'}]}]   
+        });   
+   }   
+  
+   function showManagerView()   
+   {   
+        new Ext.Viewport(   
+        {   
+            enableTabScroll:true,   
+            layout:'border',   
+            items:   
+            [{title:'',region:'north',height:100,html:'<br><br><b style=font-size:20px;color:red;>吉安青山国际机场运营系统</b>',bbar:[{text:'我的待办'},{text:'我的审批'},{text:'我的收藏'},{text:'我的设置'},{text:'注销'}]},   
+            {title:'菜单',region:'west',html:'菜单栏 ',width:200,collapsible:true},   
+            {xtype:'tabpanel',region:'center',items:[{title:'韦德'},{title:'詹姆斯'}]}   
+            ]   
+        });   
+  
+        /*new Ext.Panel(  
+        {  
+        renderTo:"panelDiv",  
+        width:700,  
+        height:800,  
+            enableTabScroll:true,  
+            layout:'border',  
+            items:  
+            [{title:'',region:'north',height:100,html:'<br><br><b style=font-size:20px;color:red;>吉安青山国际机场运营系统</b>',bbar:[{text:'我的待办'},{text:'我的审批'},{text:'我的收藏'},{text:'我的设置'},{text:'注销'}]},  
+ 
+            {title:'菜单',region:'west',html:'菜单栏 ',width:200,collapsible:true},  
+            new Ext.TabPanel({region:'center',items:[{title:'韦德',html:'rrrrwadewade+wade'},{title:'詹姆斯',html:'james+sdfsdg'}]}),  
+            {title:'菜单2',region:'east',html:'菜单栏2 ',width:150,collapsible:false}  
+ 
+            ]  
+        });*/  
+   }   
+  
+   var winIndex = 0;   
+   function openWindow()   
+   {   
+        var winContext =    
+        {   
+            title:"窗体"+winIndex++,   
+            width:400,   
+            height:300,   
+            maximizable:true,   
+            minimizable:true,   
+            resizable:true,   
+            draggable:true,   
+            closable:true,   
+            html:"<p>大家好，我是MVP韦德！</p>"  
+        };   
+        var win = new Ext.Window(winContext);   
+        win.show();   
+   }  
+function openWindowNoClose()   
+  {   
+       var winContext = {title:"我是不能关的窗体",width:800,height:500,html:"<p>大家好，我是MVP韦德！</p>"};   
+       var win = new Ext.Window(winContext);   
+    win.on("beforedestroy",function (obj)   
+    {   
+         alert("别费力气了，关不掉的。");   
+         obj.show();   
+         return false;   
+    });   
+       win.show();   
+  }   
+  
+   function openPanel()   
+  {   
+        var panCon =    
+     {   
+           renderTo:"panelDiv",   
+           title:"我是面板",   
+           width:800,   
+           height:500,   
+           html:"<p>大家好，我是MVP韦德！</p>",   
+           tools:    
+           [{ id:"save"},   
+           {id:"help",handler:function (){Ext.MessageBox.alert("help","帮助信息请查看http://www.bangzhu.com");}},   
+           { id:"close",handler:function (){Ext.MessageBox.alert("close","关闭窗口请查看http://www.guanbi.com");}} ],   
+           tbar:[{text:'顶部工具栏'},{pressed:false,text:'刷新'}],   
+           bbar:[{text:'底部工具栏'}],   
+           buttons:[{text:'按钮1'},{text:'按钮2'}]   
+    };   
+        new Ext.Panel(panCon);   
+     //var panCon = {title:"我是面板",width:800,height:500,html:"<p>大家好，我是MVP韦德！</p>"};   
+        //var pan = new Ext.Panel(panCon);   
+        //pan.render("hello");   
+  }   
+  
+    function openPanelLayout()   
+  {   
+        var panCon =    
+     {   
+           renderTo:"panelDiv",   
+           title:"我是面板",   
+           width:800,   
+           height:500,   
+           //html:"<p>大家好，我是MVP韦德！</p>",   
+           layout:'column',   
+           tools:    
+           [{ id:"save"},   
+           {id:"help",handler:function (){Ext.MessageBox.alert("help","帮助信息请查看http://www.bangzhu.com");}},   
+           { id:"close",handler:function (){Ext.MessageBox.alert("close","关闭窗口请查看http://www.guanbi.com");}} ],   
+           tbar:[{text:'顶部工具栏'},{pressed:false,text:'刷新'}],   
+           bbar:[{text:'底部工具栏'}],   
+           buttons:[{text:'按钮1'},{text:'按钮2'}],   
+           items:[{title:'1111',html:'1111',columnWidth:0.3},   
+           {title:'2222',html:'2222',columnWidth:0.3},   
+           {title:'3333',html:'3333',columnWidth:0.4}]   
+    };   
+        new Ext.Panel(panCon);   
+  }  
+function openPanelForm()   
+  {   
+        /*var panCon =   
+     {  
+           renderTo:"formDiv",  
+           title:"form",  
+           width:800,  
+           height:500,  
+           layout:'form',  
+           labelAlign:'right',  
+           buttons:[{text:'按钮1'},{text:'按钮2'}],  
+           defaultType:'textfield',  
+           items:[{fieldLabel:'姓名',id:'name'},  
+           {fieldLabel:'地址',id:'addr'},  
+           {fieldLabel:'电话',id:'tel'}]  
+    };  
+        new Ext.Panel(panCon);*/  
+  
+      var panCon =    
+     {   
+           renderTo:"formDiv",   
+           title:"form",   
+           width:800,   
+           height:500,   
+           labelAlign:'right',   
+           buttons:[{text:'按钮1'},{text:'按钮2'}],   
+           defaultType:'textfield',   
+           items:[{fieldLabel:'姓名',id:'name'},   
+           {fieldLabel:'地址',id:'addr'},   
+           {fieldLabel:'电话',id:'tel'}]   
+    };   
+        new Ext.FormPanel(panCon);   
+  }   
+     
+   function openPanelAccordion()   
+  {   
+        var panCon =    
+     {   
+           renderTo:"accordionDiv",   
+           title:"accordion",   
+           width:300,   
+           height:500,   
+           layout:'accordion',   
+           layoutConfig:{animate:true},   
+           buttons:[{text:'按钮1'},{text:'按钮2'}],   
+           items:[{title:'频道管理',html:'name'},   
+           {title:'信息发布管理',html:'addr'},   
+           {title:'应用信息',html:'tel'}]   
+    };   
+        new Ext.Panel(panCon);   
+  }   
+  
+    function openPanelTable()   
+  {   
+        var panCon =    
+     {   
+           renderTo:"TableDiv",   
+           title:"table",   
+           width:600,   
+           height:500,   
+           layout:'table',   
+           layoutConfig:{columns:3},   
+           items:[{title:'1111',html:'1111',rowspan:2,height:100},   
+           {html:'2222',colspan:2,height:100},   
+           {html:'3333',height:100}, {html:'4444',height:100}]   
+    };   
+        new Ext.Panel(panCon);   
+  }  
+function openGridPanel()   
+  {   
+        /*  
+     //普通的数据存储  
+     var data = [  
+     [1,'韦德','得分后卫','28.6','http://www.nba.com/players/id=wade'],[2,'杜兰特','小前锋','28.2','http://www.nba.com/players/id=dulat'],  
+     [3,'詹姆斯','小前锋','27.8','http://www.nba.com/players/id=james'],[4,'麦克格雷迪','得分后卫/小前锋','27.6','http://www.nba.com/players/id=mcgrady']];*/  
+     //var store = new Ext.data.SimpleStore({data:data,fields:['id','name','station','point','url']});   
+           
+     /*  
+       //xml类型的数据存储  
+       var  store = new Ext.data.Store({url:'nba.xml',reader:new Ext.data.XmlReader({recode:'row'},['id','name','station','point','url'])});*/  
+  
+     //Json类型的数据存储   
+         var data = [   
+     {id:1,name:'韦德',station:'得分后卫',point:'28.6',url:'http://www.nba.com/players/id=wade'},   
+     {id:2,name:'杜兰特',station:'小前锋',point:'28.2',url:'http://www.nba.com/players/id=dulat'},   
+     {id:3,name:'詹姆斯',station:'小前锋',point:'27.8',url:'http://www.nba.com/players/id=james'},   
+     {id:4,name:'麦克格雷迪',station:'得分后卫/小前锋',point:'27.6',url:'http://www.nba.com/players/id=mcgrady'}];   
+     var store = new Ext.data.JsonStore({data:data,fields:['id','name','station','point','url']});   
+           
+        var columnMo = new Ext.grid.ColumnModel([   
+     {header:'排名',dataIndex:'id',sortable:true,width:200,height:50},   
+     {header:'姓名',dataIndex:'name',sortable:true,width:200},   
+     {header:'位置',dataIndex:'station',sortable:true,width:200},    
+     {header:'得分',dataIndex:'point',sortable:true,width:200},   
+     {header:'个人黄页',dataIndex:'url',sortable:true,width:200,renderer:showUrl}   
+     ]);   
+       
+        var con =    
+     {   
+           renderTo:"GridPanelDiv",   
+           title:"2011-2012赛季NBA球员评分榜",   
+           width:1020,   
+           height:200,   
+           store:store,   
+           cm:columnMo   
+    };   
+        new Ext.grid.GridPanel(con);   
+        //store.load();   
+  } 
+function openEditorGridPanel()   
+   {   
+          var data = [   
+         {id:1,name:'韦德',station:'得分后卫',point:'28.6',url:'http://www.nba.com/players/id=wade',birth:'2011-01-05'},   
+         {id:2,name:'杜兰特',station:'小前锋',point:'28.2',url:'http://www.nba.com/players/id=dulat',birth:'2011-11-05'},   
+         {id:3,name:'詹姆斯',station:'小前锋',point:'27.8',url:'http://www.nba.com/players/id=james',birth:'2012-01-05'},   
+         {id:4,name:'麦克格雷迪',station:'得分后卫/小前锋',point:'27.6',url:'http://www.nba.com/players/id=mcgrady',birth:'2001-10-05'}];   
+         var store = new Ext.data.JsonStore({data:data,fields:['id','name','station','point','url',{name:'birth',type:'date',dateFormat:'Y-n-j'}]});   
+         var columnMo = new Ext.grid.ColumnModel([   
+         {header:'排名',dataIndex:'id',sortable:true,width:200,height:50},   
+         {header:'姓名',dataIndex:'name',sortable:true,width:200,editor:new Ext.form.TextField()},   
+         {header:'位置',dataIndex:'station',sortable:true,width:200,editor:new Ext.form.ComboBox(   
+         {   
+              transform:'positionDiv',   
+              triggerAction:'all'  
+         }   
+         )},    
+         {header:'得分',dataIndex:'point',sortable:true,width:200,editor:new Ext.form.TextField()},   
+         {header:'个人黄页',dataIndex:'url',sortable:true,width:200,renderer:showUrl,editor:new Ext.form.TextField()},   
+         {header:'生日',dataIndex:'birth',sortable:true,width:200,renderer:Ext.util.Format.dateRenderer('Y年m月d日'),editor:new Ext.form.DateField({format:'Y年m月d日'})}   
+         ]);   
+           
+         var con =    
+         {   
+               renderTo:"EditorGridPanelDiv",   
+               title:"2011-2012赛季NBA球员评分榜",   
+               width:1220,   
+               height:200,   
+               store:store,   
+               cm:columnMo,   
+               clicksToEdit:1   
+        };   
+         new Ext.grid.EditorGridPanel(con);   
+   }   
+      
+   function showUrl(value)   
+   {   
+        return "<a href="+value+" target='_blank'>"+value+"</a>";   
+   }   
+  
+    function openTabPanel()   
+   {   
+         var tabJson ={ renderTo:"tabPanelDiv",title:"我是面板",width:800,height:500,items:[{title:'面板1',html:'<p>大家好，我是面板1！</p>'},   
+         {title:'面板2',html:'<p>大家好，我是面板2！</p>'},{title:'面板3',html:'<p>大家好，我是面板3！</p>'}]};   
+         new Ext.TabPanel(tabJson);   
+   }  
+
+function openTreePanel()   
+   {   
+          var root1 = new Ext.tree.TreeNode({id:'广东',text:'广东'});   
+          var shenzhen = new Ext.tree.TreeNode({id:'深圳',text:'深圳'});   
+          shenzhen.appendChild(new Ext.tree.TreeNode({id:'宝安区',text:'宝安区',href:'http://www.guangdong.com/id=shenzhen-baoan',hrefTarget:'_blank'}));   
+          shenzhen.appendChild(new Ext.tree.TreeNode({id:'南山区',text:'南山区',href:'http://www.guangdong.com/id=shenzhen-baoan',hrefTarget:'_blank'}));   
+          shenzhen.appendChild(new Ext.tree.TreeNode({id:'福田区',text:'福田区',href:'http://www.guangdong.com/id=shenzhen-baoan',hrefTarget:'_blank'}));   
+          shenzhen.appendChild(new Ext.tree.TreeNode({id:'罗湖区',text:'罗湖区',href:'http://www.guangdong.com/id=shenzhen-baoan',hrefTarget:'_blank'}));   
+          shenzhen.appendChild(new Ext.tree.TreeNode({id:'盐田区',text:'盐田区',href:'http://www.guangdong.com/id=shenzhen-baoan',hrefTarget:'_blank'}));   
+          shenzhen.appendChild(new Ext.tree.TreeNode({id:'龙岗区',text:'龙岗区',href:'http://www.guangdong.com/id=shenzhen-baoan',hrefTarget:'_blank'}));   
+          root1.appendChild(shenzhen);   
+  
+          var guangzhou = new Ext.tree.TreeNode({id:'广州',text:'广州'});   
+          guangzhou.appendChild(new Ext.tree.TreeNode({id:'天河区',text:'天河区',href:'http://www.guangdong.com/id=shenzhen-baoan',hrefTarget:'_blank'}));   
+         guangzhou.appendChild(new Ext.tree.TreeNode({id:'越秀区',text:'越秀区',href:'http://www.guangdong.com/id=shenzhen-baoan',hrefTarget:'_blank'}));   
+         guangzhou.appendChild(new Ext.tree.TreeNode({id:'白云区',text:'白云区',href:'http://www.guangdong.com/id=shenzhen-baoan',hrefTarget:'_blank'}));   
+          root1.appendChild(guangzhou);   
+          root1.appendChild(new Ext.tree.TreeNode({id:'东莞',text:'东莞',href:'http://www.guangdong.com/id=shenzhen-baoan',hrefTarget:'_blank'}));   
+          root1.appendChild(new Ext.tree.TreeNode({id:'佛山',text:'佛山',href:'http://www.guangdong.com/id=shenzhen-baoan',hrefTarget:'_blank'}));   
+          root1.appendChild(new Ext.tree.TreeNode({id:'珠海',text:'珠海',href:'http://www.guangdong.com/id=shenzhen-baoan',hrefTarget:'_blank'}));   
+          root1.appendChild(new Ext.tree.TreeNode({id:'湛江',text:'湛江',href:'http://www.guangdong.com/id=shenzhen-baoan',hrefTarget:'_blank'}));   
+           var tree = new Ext.tree.TreePanel(   
+           {   
+                renderTo:'treeDiv',   
+                autoScroll:true,   
+                animate:true,   
+                root:root1,   
+                width:300   
+            });   
+         tree.on('click',function(node,event)   
+         {   
+              alert(node.id);   
+                
+         });   
+  
+     /*加载url的树形菜单  
+     var loader = new Ext.tree.TreeLoader({url:'http://w3-beta.huawei.com/w3admin/infohome.do?pcatalog=catalog'});  
+     var root = new Ext.tree.TreeNode({id:'广东',text:'广东',loader:loader});  
+     var tree = new Ext.tree.TreePanel(  
+           {  
+                renderTo:'treeDiv',  
+                autoScroll:true,  
+                animate:true,  
+                root:root1,  
+                width:300  
+            });  
+     */  
+  
+   }  
+/*   
+//获取id为div1的第一个元素   
+var c1 = Ext.get("wade1");   
+  
+//获取id为div1的元素集合   
+var c3 = Ext.select("#wade1");   
+  
+//获取title=wade的Ext.CompositeElement类型集合   
+var c4 = Ext.select("#div[title=wade]");   
+  
+//获取title=wade的dom类型集合   
+var c5 = Ext.query("#div[title=wade]");   
+  
+//获得title属性值   
+var e1 = div6.first();   
+var c7 = e1.getAttribute("title");   
+  
+//设置title属性值   
+e1.set('title','NewTitle');   
+  
+//增加样式   
+c6.addCls("class1");   
+  
+//删除样式   
+c6.removeCls("class1");   
+  
+//是否存在样式   
+c6.hasCls("class1");   
+  
+//获取html值   
+var c7 = e1.dom.innerHTML;   
+  
+//修改html的值   
+e1.update("<b>更醒后的</b>");   
+  
+//获得元素的value值   
+var c8 = e1.getValue();    
+  
+//设置元素的value值   
+e1.set({value: 150 });    
+  
+//查找class为c1的元素集合   
+var c9 = Ext.select(".c1");   
+  
+//筛选第2个元素返回   
+var c10 = c9.item(2);   
+  
+//筛选第一个和最后一个元素返回   
+var c10 = c9.first();   
+var c10 = c9.last();   
+  
+//进一步过滤   
+var c10 = c9.filter("div[title=t1]");   
+  
+//e元素结束之前插入   
+var e = Ext.select("div .c1");    
+var ee = e..first();   
+ee.insertHtml("beforeEnd", "<b>新内容</b>");    
+  
+//e元素结束之后插入   
+ee.insertHtml("afterEnd", "<b>新内容</b>");    
+  
+//e元素开始之前插入   
+ee.insertHtml("beforeBegin", "<b>新内容</b>"); 
+//e元素开始之后插入   
+ee.insertHtml("afterBegin", "<b>新内容</b>");    
+  
+//移除集合中第三个元素    
+e.removeElement(2, true);   
+  
+//删除    
+e.first().remove();    
+  
+//设置样式    
+e.setStyle("width", "550px");    
+e.applyStyles   
+({    
+    height: "500px",    
+    color: "red",    
+    position: "absolute"    
+});    
+  
+//设置高度，带动画效果    
+e.setHeight(100, true);    
+  
+//设置定位    
+e.setLeft("50px");    
+e.setTop("10px");    
+e.setLeftTop("100px", "50px");    
+  
+//获取宽度    
+e.getWidth();    
+    
+//给元素绑定click事件：    
+var clickhandler = function ()   
+{    
+    Ext.Msg.alert("消息", "click事件被触发！");    
+};    
+e.on("click", clickhandler);    
+  
+//解除绑定click事件    
+e.un("click", clickhandler);    
+  
+//hover事件   
+e.hover(function () {    
+    e.setStyle("background-color", "Red");    
+}, function () {    
+    e.setStyle("background-color", "Aqua");    
+});   
+  
+常用的组件或控件----------------------------------------------------------------------------------------   
+对话框、窗口、面板、多选项面板、viewPort面板、事件处理、layout布局、表格、可编辑表格、树形菜单   
+layout布局----form,fit,table,border,accordion,column,card   
+*/   
+  
+  
+</script>   
+</BODY>   
+</HTML>  

@@ -1,0 +1,315 @@
+&&&&& 关于rest服务      
+http://dggap001-ts.huawei.com/service/rest/applicationinfo/2      
+     
+jsr311-api.jar      
+wink-1.1.3-incubating.jar      
+     
+web.xml配置：      
+<servlet>      
+        <servlet-name>RestService</servlet-name>      
+        <servlet-class>org.apache.wink.server.internal.servlet.RestServlet</servlet-class>      
+        <init-param>      
+            <param-name>applicationConfigLocation</param-name>      
+            <param-value>/WEB-INF/resources</param-value>      
+        </init-param>                   
+        <load-on-startup>1</load-on-startup>      
+    </servlet>              
+     
+     
+     
+resource.resource      
+     
+com.huawei.w3.framework.web.service.rest.userprofile.UserProfileResource      
+com.huawei.w3.framework.web.service.appinfo.ApplicationInfoResource      
+com.huawei.w3.framework.web.service.appinfo.ApplicationInfoCommentResource      
+com.huawei.w3.framework.web.service.bookmark.Bookmark      
+com.huawei.w3.framework.web.service.bookmark.BookmarkTag      
+com.huawei.w3.framework.web.service.header.Header      
+     
+     
+     
+ApplicationInfoResource.java      
+     
+import javax.servlet.http.HttpServletRequest;      
+import javax.servlet.http.HttpSession;      
+import javax.ws.rs.GET;      
+import javax.ws.rs.Path;      
+import javax.ws.rs.PathParam;      
+import javax.ws.rs.Produces;      
+import javax.ws.rs.QueryParam;      
+import javax.ws.rs.core.Context;      
+import org.json.JSONArray;      
+import org.json.JSONException;      
+import org.json.JSONObject;      
+@Path("/applicationinfo")      
+public class ApplicationInfoResource       
+{      
+   @Context HttpServletRequest req;      
+     
+        @SuppressWgs("unchecked")      
+    @GET      
+    @Produces("application/json")      
+    public JSONArray getAppDomains(@QueryParam("lan") String lan) throws ApplicationException, JSONException      
+    {       
+         JSONArray jsonArray = new JSONArray();      
+         JSONObject obj = new JSONObject();      
+         obj.put("name", "wade");      
+         jsonArray.put(obj);      
+         return jsonArray;      
+    }      
+     
+    @GET      
+    @Path("/id/{applicationid}")      
+    @Produces("application/json")      
+    public JSONObject getAllApplicationBasic(@PathParam("applicationid") String applicationid,@QueryParam("lan") String lan) throws Exception      
+    {      
+        JSONObject obj = new JSONObject();      
+        obj.put("appId", vo.getAppid());      
+        obj.put("appShortName", isEn?vo.getAppShortNameEn():vo.getAppShortNameCn());              
+        return obj;      
+    }      
+}     
+  
+  
+rest是针对http协议的web服务，其get、delete、put、post是增对数据库的增删改查操作，优点简洁高效      
+webservice针对soap协议的web服务，优点成熟安全      
+     
+     
+     
+     
+                 $.ajax({      
+            url: "http://dggap001-ts.huawei.com/service/rest/userprofile?time=44444",      
+            type:"GET",      
+            contentType:"application/json;charset=utf-8",      
+                dataType:"json",      
+            success:function(data){},      
+            error:function(msg){}      
+        });      
+     
+     
+     
+     
+               Object returnObj  = new Object();      
+               String method = "get";      
+               String returnDataType = "jsonarray";      
+               RestClient client = new RestClient();      
+               Resource resource = client.resource(url);      
+                                if(method.toLowerCase().equals("get"))      
+                {      
+                    returnObj = resource.accept("application/json").get("jsonarray".equals(returnDataType) ? JSONArray.class : JSONObject.class);      
+                }      
+                else if(method.toLowerCase().equals("post"))      
+                {      
+                    returnObj = resource.contentType("application/json").accept("application/json").post(String.class,new JSONObject(data));      
+                }      
+                else if(method.toLowerCase().equals("put"))      
+                {      
+                    returnObj = resource.contentType("application/json").accept("application/json").put(Object.class);      
+                }      
+                else if(method.toLowerCase().equals("delete"))      
+                {      
+                    returnObj = resource.accept("application/json").delete(Object.class);      
+                }                     
+     
+       <html>      
+<head>      
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">      
+<title>Rest</title>      
+<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>      
+<script type="text/javascript" src="js/jquery.json-2.2.min.js"></script>      
+<script type="text/javascript" src="js/RestHelper.js"></script>      
+<script>      
+var wade ={"id":"3","point":"27.9","name":"wade"};      
+var james ={"id":"6","point":"28.2","name":"james"};      
+var carter ={"id":"15","point":"24.2","name":"Carter"};      
+var nbaArray = new Array();      
+nbaArray[0] = wade;      
+nbaArray[1] = james;      
+$(nbaArray).each(function ()      
+{      
+     //alert("5===="+this.name);      
+});      
+for(var i=0;i<nbaArray.length;i++)      
+{      
+     //alert("6===="+nbaArray[i].name);      
+}      
+//alert($.toJSON(carter));      
+//alert($.toJSON(nbaArray));     
+  
+function getJsonObj()      
+{      
+   $.ajax({      
+            url : "http://localhost.huawei.com:9133/service/rest/applicationinfo/getJsonObj",      
+            type : "get",      
+            data : "id=3&name=wade&point=27.7",      
+            contentType:"application/json;charset=utf-8",      
+            error : function(msg)      
+            {      
+                alert("error: "+msg.status);      
+            },      
+            success : function(msg)      
+            {      
+                var divText = "id: "+msg.id+";  name: "+msg.name+";   point: "+msg.point;      
+                $("#jsonObjId").text(divText);      
+            }      
+       });      
+}      
+          
+function getJsonArray()      
+{      
+     
+   $.ajax({      
+            url : "http://localhost.huawei.com:9133/service/rest/applicationinfo/getJsonArray",      
+            type : "get",      
+            //data : 'id=3&name=wade&point=27.7&james={"id":"15","point":"24.2","name":"Carter"}',      
+            data : 'id=16&name=czj&point=20.7&james='+$.toJSON(carter)+'&array='+$.toJSON(nbaArray),      
+            contentType:"application/json;charset=utf-8",      
+            error : function(msg)      
+            {      
+                alert("error: "+msg.status);      
+            },      
+            success : function(msg)      
+            {      
+                var divText = "";      
+                $(msg).each(function ()      
+                {      
+                    divText+="id: "+this.id+";  name: "+this.name+";   point: "+this.point+"  ";      
+                });      
+                $("#jsonArrayId").text(divText);      
+            }      
+       });      
+}      
+     
+</script>      
+</head>      
+<body style="text-align:center;margin:auto;scroller:no;" onload="$('#jsonpa').hide();">      
+<div style="margin-top:20px; text-align:left; width:650px;">      
+<p> </p>      
+     
+     
+<a href="javascript:getJsonObj();">提  交I</a>      
+<div id="jsonObjId">      
+</div>      
+     
+<p> </p>      
+<a href="javascript:getJsonArray();">提  交II</a>      
+<div id="jsonArrayId">      
+</div>      
+</div>      
+</body>      
+</html>    
+  
+@SuppressWarnings("unchecked")      
+    @GET      
+    @Path("/getJsonObj")      
+    @Produces("application/json")      
+    public JSONObject getJsonObj(@QueryParam("id") String id,@QueryParam("name") String name,      
+            @QueryParam("point") String point)  throws Exception      
+    {      
+        JSONObject obj = new JSONObject();      
+        obj.put("id",id);      
+        obj.put("name",name);      
+        obj.put("point",point);      
+        return obj;      
+    }      
+          
+    @SuppressWarnings("unchecked")      
+    @GET      
+    @Path("/getJsonArray")      
+    @Produces("application/json")      
+    public JSONArray getJsonArray(@QueryParam("id") String id,@QueryParam("name") String name,      
+            @QueryParam("point") String point,@QueryParam("james") JSONObject james,@QueryParam("array") JSONArray arrayParam)  throws Exception      
+    {      
+        JSONArray array = new JSONArray();      
+        JSONObject obj = new JSONObject();      
+        obj.put("id",id);      
+        obj.put("name",name);      
+        obj.put("point",point);      
+        array.put(obj);      
+        array.put(james);      
+        for(int i=0;i<arrayParam.length();i++)      
+        {      
+            JSONObject jOb = arrayParam.getJSONObject(i);      
+            array.put(jOb);      
+        }      
+        return array;      
+    }      
+     
+     
+     
+public List getMyApplicationAll(HttpServletRequest request,PageVO page) throws JSONException      
+{      
+        String urlParam = "/task/allapplist?curpage="+page.getCurPage()+"&num="+page.getCountPerPage() ;      
+        org.json.JSONArray jsonAarry =(org.json.JSONArray)JsonUtil.getRestServiceData(request,urlParam);      
+        StringBuffer bf=new StringBuffer();      
+        List<W3ToDoTaskVO> taskVOList=null;      
+        bf.append("[").append(jsonAarry.join(",")).append("]");      
+                net.sf.json.JSONArray jsonArr= net.sf.json.JSONArray.fromObject(bf.toString());      
+        taskVOList=new ArrayList<W3ToDoTaskVO>();      
+        if(null!=jsonArr&&jsonArr.size()>0)      
+        {      
+            for(int i=0;i<jsonArr.size();i++)      
+            {      
+                taskVOList.add((W3ToDoTaskVO)JSONObject.toBean(jsonArr.getJSONObject(i), W3ToDoTaskVO.class));      
+            }      
+        }      
+        return taskVOList;      
+}      
+     
+     
+     
+public static  Object getRestServiceData(HttpServletRequest request,String urlParam)       
+    {      
+        Object obj=null;      
+        try       
+        {      
+            String url = DAOService.getPatterConfigValue("respath_config", "w3_service_root");      
+            url = url+urlParam;      
+            obj=restData(request,url.replaceAll(" ", "%20"),"get","");      
+        }      
+        catch (Exception e) {}      
+        return obj;      
+    }     
+  
+private static  Object     restData(HttpServletRequest request,String url, String method,String returnDataType)      
+    throws ApplicationException,JSONException, URISyntaxException, IOException, org.apache.wink.json4j.JSONException       
+    {      
+        if(StringUtils.isEmpty(returnDataType))returnDataType="jsonarray";      
+        Object j  = new Object();                 
+        RestClient client = new RestClient();             
+        Resource resource = client.resource(url);      
+        String cookieStr = "";      
+        for(Cookie k : request.getCookies())      
+        {      
+            cookieStr += k.getName() + "=" + k.getValue()+"; ";      
+        }      
+        resource.cookie(cookieStr);      
+        try     
+        {                     
+            if(method.toLowerCase().equals("get"))      
+            {      
+                j = resource.accept("application/json").get("jsonarray".equals(returnDataType) ? org.json.JSONArray.class :org.json.JSONObject.class);      
+            }      
+            else if(method.toLowerCase().equals("post"))      
+            {      
+                j = resource.contentType("application/json").accept("application/json").post(String.class,new org.json.JSONObject(""));      
+            }      
+            else if(method.toLowerCase().equals("put"))      
+            {      
+                j = resource.contentType("application/json").accept("application/json").put(Object.class);      
+            }      
+            else if(method.toLowerCase().equals("delete"))      
+            {      
+                j = resource.accept("application/json").delete(Object.class);      
+            }                                     
+        }      
+        catch(ClientWebException es)      
+        {      
+            return null;      
+        }      
+        catch(Exception e)      
+        {      
+            return null;      
+        }      
+        return j;      
+    }    

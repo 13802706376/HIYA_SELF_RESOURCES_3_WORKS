@@ -1,0 +1,1048 @@
+第一部分   基础知识与体系结构      
+  
+一、Oracle概述   
+1.数据库基础   
+@ 数据-----描述事物的符号，是数据库中存储的基本对象   
+@ 数据库-----按照一定的数据模型组织、描述和存储的数据的集合，具有较高的数据独立性，小的冗余度，可以实现数据共享   
+@ 数据库管理系统-----为科学组织和存储数据库中的数据，高效率的获取和维护数据，采用DBMS的系统软件来管理数据库   
+  位于用户和操作系统之间的一层数据管理软件，通常所说的数据库产品（Oracle,DB2,Informix,Sybase）都是DBMS。   
+@ 数据库系统-----数据库、数据库管理系统、计算机系统共同组成了一个数据库系统，通常由数据库，操作系统，DBMS，开发工具，应用系统，DBA，用户组成   
+  
+                    用户(另类系统)     用户(终端)     用户(PC)   
+                                   |   
+                                应用系统(订票系统)   
+                                   |   
+                                开发工具（PL/SQL,Dbvisual）   
+                                   |   
+                                  DBMS   
+                               |   
+                                操作系统   
+                   |   
+                                数据库   
+  
+2.数据库的发展   
+@ 人工管理阶段，1950以前，数据不共享，不独立，冗余量大   
+@ 文件系统管理阶段，1950-1965，数据可以长期保存，共享性差，独立性差   
+@ 数据库系统管理阶段，1965以后，数据结构化存，共享性强，独立性好，冗余量低，统一数据管理和控制   
+  
+3.数据模型   
+@ ER图   
+实体（Entity）-矩形   
+属性（Attribute）-椭圆   
+关系（Relation）-菱形   
+@ 四种对象模型   
+层次模型---树   
+网状模型---图   
+关系模型---表，Oracle,DB2等流行数据库都是关系数据库   
+关系：表   
+元祖：行   
+元素：列   
+属性：列   
+优点：存储路径对用户透明，具有更高的数据独立性和保密性，简化了程序员的开发工作   
+缺点：查询效率往往不太乐观，必须对用户的查询语句进行优化。   
+对象模型---对象  
+
+4.Oracle数据库简介   
+Oracle公司于1979年发布的世界上第一个关系数据库   
+1992发布oracle7,1997.6发布oracle8,1998.9发布oracle8i，2000发布oracle9i，2004发布oracle10g   
+  
+@ 特点   
+支持多用户、大事物量的事物处理   
+提供标准操作接口   
+实施安全性控制和完整性控制   
+支持分布式数据处理   
+具有可移植、可兼容性和可连接性   
+  
+@ 应用结构   
+客户机-服务器（C/S）模式--客户端需要安装客户端程序，直接访问服务器，速度快，维护升级不方便，如PL/SQL DEVELEPOR   
+浏览器-服务器（B/S）模式--三级架构，客户端只要安装浏览器就OK了，通过访问WEB服务器对数据库进行操作和访问，方便了程序的维护和升级，但是降低了网络执行效率   
+分布式数据库模式--分布于计算机网络的多个逻辑相关的数据库组成，每个数据库都具有独立的处理能力   
+  
+@ 创建数据库：安装时创建；DCBA创建   
+  
+@ OEM和SQL*PLUS   
+  
+二、体系结构   
+见笔记本   
+  
+     
+第二部分   SQL语句      
+     
+一、分类   
+1.DML语句，包含insert、update、delete、select等常用语句    
+  
+●增删改操作    
+新增：insert into book(id,name) values(2,"Wade");    
+批量新增：insert into book(id,name) select t.id,t.nameCn from book_change;    
+修改：update book set name="McGrady" where id=2;    
+删除：delete book where id=2    
+全部删除(低效)：delete book    
+全部删除(高效)：Truncate table book    
+  
+employee雇员信息表    
+emp_id 雇员编号 NOT NULL NUMBER(4)    
+emp_name 雇员姓名 VARCHAR2(10)    
+emp_station 工作岗位 VARCHAR2(9)    
+emp_managerId 该雇员经理人的编号 NUMBER(4)    
+emp_inDate 入职时间 DATE    
+emp_salary 薪水 NUMBER(7,2)    
+emp_allowance 津贴 NUMBER(7,2)    
+emp_depId 雇员所在部门编号 NUMBER(2)    
+departmentà部门信息表    
+dep_id 部门编号 NOT NULL NUMBER(2)    
+dep_name 部门名字 VARCHAR2(14)    
+dep_loction 部门所在地 VARCHAR2(13)    
+salarygradeà薪水等级表    
+Sg_id 薪水等级 NUMBER    
+Sg_minSal 该等级的最低薪水值 NUMBER    
+Sg_maxSal 该等级的最高薪水值 NUMBER   
+●基本查询(消除重复或字段)    
+select distinct * from employee;    
+select emp_id, emp_name, emp_salary from employee;    
+  
+●查询算术表达式语句    
+select emp_id, emp_salary*2 from employee;    
+select 55/2 from dual;    
+select sysdate from employee where emp_id = 3;    
+select emp_name,emp_salary*12+emp_allowance from employee    
+  
+●别名    
+select emp_id, emp_salary*2 ‘doubleSal’from employee;    
+select em.emp_id, em.emp_salary*2 as‘doubleSal’from employee em;    
+  
+●where过滤数据    
+select * from employee where emp_depId = 3;    
+Select * from employee where emp_name = 'Wade' and emp_depId = 3;    
+Select emp_name, emp_salary from employee where emp_salary between 800 and 1500;    
+Select emp_name, emp_salary from employee where emp_salary <= 800 or emp_salary >=1500;    
+Select * from employee where emp_allowance is not null;    
+Select * from employee where emp_allowance is in(100,200,400,800,1000);    
+select * from t_application_info where app_id in (select t.bussines_id from t_profile t);   
+select * from t_application_info app where exists  (select 1 from t_profile t where t.bussines_id =app.app_id );   
+Select * from employee where emp_name is not in('Wade','McGrady','James');    
+Select * from employee where emp_inDate > '20-2月-2010';    
+Select * from employee where emp_inDate between to_date('2012-01-01','yyyy-mm-dd') and sysdate;    
+Select * from employee where emp_name like‘%Wade%’escape '\';                                      包含或等于Wade,%代表多个字符   
+Select * from employee where emp_name like‘_W%’escape '\';                                         第二个字母为w，_代表一个字符   
+Select * from employee where emp_name like '%\%%' escape '\' or emp_name like '%\_%' escape '\';     查找包含%或_的词   
+  
+●order by 语句    
+Select emp_name, emp_salary from employee order by emp_name,emp_salary,emp_inDate;    
+Select emp_name, emp_salary from employee order by emp_salary desc;    
+  
+●group by语句    
+Select emp_depId , avg(emp_salary) as ‘平均工资’，max(sal) as ‘最大工资’ from employee group by emp_depId having max(sal) > 2000;    
+Select emp_depId ,avg(emp_salary) from employee where emp_salary > 1200 group by emp_depId having avg(emp_salary) > 1500 Order by avg(emp_salary);    
+使用group by 的规律：    
+出现在select列表中的字段，如果没有出现在组函数中，则必须出现在group by子句中。 
+●表的连接    
+select * from t_application_info ap,t_profile t where ap.app_id = t.bussines_id;   --自然连接   
+select * from t_application_info ap join t_profile t on  ap.app_id = t.bussines_id;  --等效自然连接，写法不一样而已    
+select * from t_application_info ap left join t_profile t on  ap.app_id = t.bussines_id;  --左连接，以左表为基准，右表为空的记录页查询出来      
+select * from t_application_info ap right join t_profile t on  ap.app_id = t.bussines_id;  --右连接，以右表为基准，左表为空的记录页查询出来     
+select * from t_application_info ap full join t_profile t on  ap.app_id = t.bussines_id;  --全连接，左表和右表为空的记录页查询出来     
+select * from t_application_info ap where ap.app_id in(select distinct(t.bussines_id) from t_profile t); --类似自然连接，但只能查询左表的属性       
+select * from t_application_info ap left join  (select * from t_application_info ap,t_profile t where ap.app_id = t.bussines_id) w1     
+on ap.app_id = w1.bussines_id                                                            --多表连接，原理是把一个或若干个连接的结果当做一个表再与外表进行连接      
+select *  from t_application_info ap, (select * from t_profile t1 where t1.bussines_id is not null) t         
+where ap.app_id = t.bussines_id;                                                          --原理是把一个或若干个连接的结果当做一个表在与外表自然连接    
+select w2.* from (select w1.*, rownum mynum  from (select * from t_application_info) w1  where rownum <= 100) w2 where mynum >= 20    --分页语句    
+  
+●子查询(理解子查询的关键-->把它当成一张表)    
+Select emp_name,emp_salary from employee where emp_salary =(Select max(emp_salary) from employee);    
+按照部门进行分组之后挣钱最多的那个人的名字，部门编号？    
+Select emp_salary,emp_name, emp_deptId from employee e , (Select max(emp_salary) as‘maxSalary’,emp_deptId from employee group by emp_deptId) t where e.emp_salary = t.maxSalary and e.emp_deptId = t.emp_deptId;    
+  
+求每个部门的平均薪水等级是多少？    
+Select t.avgSalary, t.emp_deptId, s.sg_id from salarygrade s, (Select avg(emp_salary) as‘avgSalary’,emp_deptId from employee group by emp_deptId) t where t.avgSalary between s.sg_minSal and s.sg_maxSal group by emp_deptId.    
+  
+2.DDL语句，包含create、alter、truncate、drop等常用语句    
+(1)模式对象：用户数据是以对象的形式存在的，并以模式的单位进行组织   
+(2)表、视图、索引、索引化表、序列、同义词、PL/SQL包、存储过程、存储函数、JAVA类属于模式对象；   
+表空间、用户、角色、回退段、概要文件不属于模式对象；  
+(3)表   
+创建普通表：   
+create table book    
+(    
+id number(10) not null,    
+name varchar2(50) default ‘wade’ ,    
+shopId number(10) not null constraint book_shopId_fk refrences shop(id),    
+produceDate date default sysdate,    
+constraints pk1 primary key(id, produceDate)    
+)    
+  
+利用子查询创建表：   
+a:可以修改列的名称，不能修改数据类型   
+b:子查询返回数据则新标包含查到的数据，否则为一个空表   
+create table t2(no,name,dept)   
+as    
+select e.empno,e.name,e.deptno from emp e;   
+  
+创建临时表   
+  
+约束的种类   
+表级约束--同时约束多个列名   
+列级约束--约束一个列名，跟随在列名之后   
+主键约束--唯一、非空、一个表只有一个主键，但一个主键可以包含多个字段，同时建立一个唯一索引   
+id number(20) primary key     
+constraint pk1 primary key (id)    
+alter table book add constraint pk1 primary key (id)   
+alter table drop constraint pk1   
+  
+唯一性约束--建立一个唯一索引，如果未定义非空约束，则可以包含多个空值   
+id number(20) unique    
+alter table book add constraint puk unique(name)    
+alter table book drop unique(name)    
+alter table book constraint puk   
+  
+外键约束--取值要么是外表对应的值，要么为空   
+shopId number(10) constraint fk1 refrences shop(id)   
+constraint fk1 foreign key (shopId) refrences shop(id)    
+alter table book add constraint fk1 foreign key (shopId) refrences shop(id) on delete cascade/set null/resttricted   
+cascade/set null/resttricted: 删除字表相关的数据/设为空值/受限删除   
+alter table book drop constraint fk1  
+非空约束--列级约束   
+alter table book modify name not null   
+alter table book modify name null   
+  
+检查约束--限制列值所允许的取值范围的   
+age number(20) check(age between 20 and 30)   
+alter table book add constraint fc1 check(age between 20 and 30)    
+alter table book drop constraint fc1   
+  
+禁用和激活约束   
+alter table book disable unique(name)    
+alter table book modify constraint puk disable    
+alter table book enable unique(name)    
+alter table book modify constraint puk enable   
+  
+查询book表所有约束信息   
+select * from user_constraints where table_name = 'book'  
+  
+表的操作   
+alter table book add(id number(20),author varchar(20) not null)    
+alter table book modify author number(40)   
+alter table book drop column author    
+alter table book modify name default ‘McGrady’    
+alter table book rename column author to author2    
+alter table book rename to book2    
+comment on table book is '书籍信息表'  
+comment on column book.name is '书名 '  
+drop table book    
+truncate table book   
+常见的系统表   
+user_constraints-----约束表   
+dual-----哑表   
+user_indexes-----索引表   
+all_users-----包含数据库所有的用户的用户名，ID，创建时间   
+dba_users-----包含数据库所有的用户的详细信息   
+user_users-----包含当前用户的详细信息   
+v$open_cursor-----包含用户执行的SQL语句信息   
+dba_tab_privs-----包含数据库所有对象的授权信息   
+user_tab_privs-----包含当前用户的授权信息   
+dba_roles-----所有角色及其描述   
+  
+(4)索引   
+@ 提高表的查询效率，建立在表列上的数据库对象，有独立的物理和逻辑结构   
+@ 如果没有建立索引，则进行全表扫描，否则索引记录了数据的物理地址，即rowid,根据rowid可以很快找到数据。   
+@ 唯一索引--索引值不重复的索引   
+@ 位图索引--每一个索引值建立一个位图   
+@ 复合索引--多个列上建立索引   
+@ 优点：增加查询速速，特别是连接查询   
+@ 缺点：作为一个独立的模式对象存在，需要占用存储空间和间期进行维护   
+create index index1 on book(id)    
+create unique index index1 on book(id)    
+create index index1 on book(id,name, produceDate)    
+drop index index1    
+alter index iudex1 rename to index2    
+select * from user_indexes    
+  
+(5)索引化表---是一种特殊的表，将表的数据和索引的数据存储在一起，主要是和经常通过主键查询整个记录或部分记录的情况。   
+create table book    
+(    
+id number(10) not null,    
+name varchar2(50) default ‘wade’ ,    
+shopId number(10) not null constraint book_shopId_fk refrences shop(id),    
+produceDate date default sysdate,    
+constraints pk1 primary key(id, produceDate)    
+)    
+organization index;  
+
+(6)视图--一个或多个表或视图中提取出来的一种表现形式，是一个虚表，通过视图可以提高数据的安全性，隐藏数据的复杂性，简化查询语句，保存复杂查询，分离引用程序和基础表。   
+create or replace view v1 as select * from book where id <200 with read only （只能查询）   
+select * from v1   
+drop view v1    
+可以对视图进行DML操作，前提是没有with read only，但是出现以下的关键字时不能操作   
+@集合操作符（union,union all,intersect,minus）   
+@聚集函数（avg,sum,count,max）   
+@group by,connect by或start with，distinct等语句   
+  
+(7)序列--产生唯一序号的数据库对象吗，一般为主键，长度为38位的十进制数   
+create sequence s1 increment by 1 start with 1 maxvalue 1000000;   
+select s1.currval from dual;   
+select s1.nextval from dual;   
+insert into book(id,name) values(s1.nextval,'james');   
+drop sequence s1    
+  
+(8)分区表和分区索引   
+@随着数据库技术的飞速发展，数据库数据容量越来越大，表中数据达到GB甚至是TB的十分普遍，如何对这些海量数据进行管理是数据库的难题   
+ 分区技术是ORACLE对巨型表或巨型索引进行维护和管理的重要技术。   
+@将一个巨型表或巨型索引分成若干个独立的组成部分进行存储和管理叫分区技术   
+  
+create table student_rang   
+(   
+  sno number(20) primary key,   
+  name varchar2(50),   
+  birth date   
+)   
+partition by rang/list/hash(birth)   
+(   
+   partition p1 values less then to_date('2000-01-01','yyyy-mm-dd') tablespace oracle1,   
+   partition p2 values less then to_date('2005-01-01','yyyy-mm-dd') tablespace oracle2,   
+   partition p3 values less then to_date('2010-01-01','yyyy-mm-dd') tablespace oracle3,   
+);  
+
+create index  i1 on p1(name) local;   
+  
+(9)同义词-----数据库中表、视图、索引或其他模式对象的别名   
+A:可以保证对象的安全性（隐藏实际名称）   
+B:可以简化对象访问   
+C:数据对象改变时，可以修改同义词而不要修改应用程序   
+create public synonym book_syn for czj.book;   
+update book_syn set name = 'wade' where id = 34500 ;   
+drop synonym book_syn;   
+  
+(10)数据库连接   
+分布式系统数据库环境一个数据库与另一个数据库之间的通信途径，将远程数据库映射到本地，所有可以访问本地数据库的应用程序都可以操作远程   
+create database link d_link connect to czj identified by wade399 using 'w3en' ;   
+update emp@d_link set name = 'wade' where id = 34500   
+  
+  
+3.TCL语句，commit、rollback等常用语句    
+  
+declare    
+v_idDelete number(10):=3;    
+v_idUpdate number(10):=2;    
+v_name varchar(20):="James";    
+begin    
+delete book where id= v_idDelete;    
+update book set name=v_name where id = v_idUpdate;    
+commit;    
+exception    
+when others then    
+rollback;    
+end;    
+/    
+  
+java代码里面使用：    
+Connection con = null;    
+try    
+{    
+con = DriverManager.getConnection(“jdbc:oracle:thin:@127.0.0.1:1521:MyOrcl”, ”czj”,”cc”);    
+con.setAutoCommit(false);    
+addBook(book);    
+addCostumer(cos);    
+updateSum(1);    
+con.commit();    
+}    
+catch(Exception ex)    
+{    
+con.rollback();    
+throw new RuntimeException(“Sorry! System error!”,ex);    
+}    
+finally    
+{    
+con.close();    
+}   
+
+4.DCL语句，invoke、voke主要用于权限的分配与回收.(见第四部分)   
+  
+5 SQL语句优化：   
+1  使用索引   
+2  使用表的别名   
+3  只查询需要的列，不要select *   
+4  in关键字清晰易懂，但是效率不高，建议用exists代替，not in用not exists代替   
+5  is null或is not null 是不会引用索引的，因为索引是不会索引空值的，建议用其他功能    相似的关键字   
+6  >或<操作符，>2和>=3的效果完全不一样，>2会先找到=2的记录在进行比较，而>=3的会直     接找到=3的记录   
+7  用union all 代替union，union不仅会把两个结果合而且会去掉重复的排序，union all仅    仅是合并   
+8  from多个表时候，把数据量最少的表写在最后面，首先扫描；   
+9  where字句采用自下而上的顺序依次过滤，所以把表的连接条件写在最前面，那些可以过滤   掉最大数量的条件写在末尾   
+10  用where字句代替having子句，having只会在检索出所有记录之后才会进行过滤   
+     
+     
+  
+  
+  
+  
+  
+  
+  
+  
+  
+第三部分   SQL函数      
+  
+& 把'0755-'、'23288344'、'转23'三个字符串连接起来   
+select concat('0755-','23288344')||'转23' from dual;   
+  
+& 将'wade'字符串的第一个字母变为大写   
+select initcap('wade') from dual;    
+  
+& 从'oracleoracle'搜索'a'第2次出现的位置，从第4个字母开始搜索    
+select instr('oracleoracle','a','4','1') instring from dual;   
+  
+& 返回数字5555的长度   
+select length(5555) from dual;   
+  
+& 返回'Wade'所有的字符大写和小写的字符串   
+select upper('Wade'),lower('Wade') from dual;   
+  
+& 先在字符串'gao'的右边贴上10个'*'，再在左边贴上27个'*'  
+select lpad(rpad('gao',10,'*'),27,'*')from dual;   
+  
+& 字符串'wade and mcgrady'从第3个开始取，取8个   
+select substr('wade and mcgrady',3,8) from dual;   
+  
+& 字符串'he love no you'中'he'换成'i'  
+select replace('he love no you','he','i') from dual;  
+& 返回-100的绝对值   
+select abs(-100) from dual;   
+  
+& 返回大于或等于3.14156的最小整数   
+select ceil(3.14156) from dual;   
+  
+& 数值55.5和-55.7的四舍五入和去掉小数部分   
+select round(55.5),round(-55.7),trunc(55.3),trunc(-55.7) from dual;   
+  
+& 增加2月和减少2月   
+select add_months(to_date('199912','yyyymm'),2),add_months(sysdate,-2) from dual;   
+  
+& 返回日期所在月的最后一天   
+select last_day(sysdate) from dual;   
+  
+& 用来得到系统的当前日期   
+select to_char(sysdate,'yyyy--mm--dd') from dual;   
+  
+& 把日期、数字转化成字符串   
+select to_char(sysdate,'yyyy--mm--dd') from dual;   
+select to_char(sysdate,'yyyy/mm/dd') from dual;   
+select to_char(44444) from dual;   
+  
+& 把字符串转化成日期   
+select to_date('2012-11-12','yyyy-mm-dd') from dual;   
+  
+& 把字符串转化成数字   
+select to_number('1999') from dual;   
+  
+& 返回当前的用户   
+select user from dual;   
+  
+& 求一个字段的平均值、最小值、最大值、总数量、总数   
+select avg(t.app_info_source),min(t.app_info_source),max(t.app_info_source),count(t.app_info_source),sum(t.app_info_source) from t_application_info t   
+    
+& case when then 语句   
+(1)和decode用法一样   
+select    
+case t.name    
+when 'wade' then 'WWW'  
+when 'james' then 'jjj'  
+else 'Other'    
+end    
+from student t;   
+(2)特有的用法   
+select case when 55 <60 then 'd'  
+when 55 >=60 and 55 <70 then 'c'  
+when 55 >=70 and 55 <80 then 'b'  
+else 'a' end from dual;  
+& NVL和NVL2用法   
+select nvl(null,1) from dual;      1   
+select nvl(3,1) from dual;         3   
+select nvl2(null,1,2) from dual;   2   
+select nvl2(5,3,1) from dual;      3   
+  
+&DECODE函数   
+select    
+decode(concat('wa','de'),'wade','www','james','jjj','other')   
+from dual;   
+  
+& 结果处理函数   
+UNION： 将多个结果集的行合并，并移除重复的行。   
+UNION ALL： 将多个结果集所有的行合并，不论是否有重复的行。   
+EXCEPT： 提取只在 EXCEPT 左侧存在，但右侧不存在的行。   
+INTERSECT： 只提取两个结果集里，都存在的行。   
+  
+select t1.app_name_en from t_application_info t1   
+union all   
+select t2.app_name_en from t_application_info_change t2   
+  
+select t1.app_name_en from t_application_info t1   
+union    
+select t2.app_name_en from t_application_info_change t2   
+  
+select t1.app_name_en from t_application_info t1   
+intersect   
+select t2.app_name_en from t_application_info_change t2   
+  
+SELECT t1.app_name_en from t_application_info t1   
+EXCEPT    
+select t1.app_name_en from t_application_info t1   
+INTERSECT   
+select t2.app_name_en from t_application_info_change t2;   
+  
+  
+& 分析函数   
+select name,row_number() over(partition by name order by point) from wade;   
+以name分区,以point排序的rownumber   
+  
+select name,rank() over(partition by name order by point) from wade;   
+和row_number()类似   
+  
+select name,min(point) over(partition by name order by point) from wade;   
+以name分区,以point排序的point最小值   
+  
+select name,max(point) over(partition by name order by point) from wade;   
+以name分区,以point排序的最大值   
+  
+select name,count(point) over(partition by name order by point) from wade;   
+以name分区,以point排序的数量   
+  
+select name,avg(point) over(partition by name order by point) from wade;   
+以name分区,以point排序的平均数   
+  
+select name,sum(point) over(partition by name order by point) from wade;   
+以name分区,以point排序的总数  
+&其它函数   
+(1)排序总规则(中文-拼音-数字)   
+select * from wade order by nlssort(name,'NLS_SORT=SCHINESE_PINYIN_M');   
+  
+(2)找出id等于3的所有子记录   
+ select *   
+ from wade   
+ start with id = 3   
+ connect by nocycle prior id = parentId   
+  
+(3)判断该字段是否是全数字组成   
+select replace(translate('22','1234567890',' '),' ','') from dual;  null   
+select replace(translate('ee22','1234567890',' '),' ','') from dual;   ee   
+select replace(translate('','1234567890',' '),' ','') from dual;   null   
+select replace(translate(null,'1234567890',' '),' ','') from dual;   null   
+  
+  
+  
+  
+  
+  
+  
+      
+第四部分   权限与备份   
+一、安全方面   
+安全性是对于一个数据库系统是至关重要的，衡量一个数据库产品的重要指标，如果没有足够的安全性，可能导致数据的丢失、泄露、破坏，造成无法估计的损失。   
+数据库安全性包括2个方面：一是防止非法用户对数据库的访问，未授权的用户不能登录数据库；二是每个数据库用户都有不同的权限，只能进行自己权限范围内的操作。   
+Oracle安全性包括2个部分：   
+@系统安全性---有效的用户名与口令的组合、用户是否被授权、用户的磁盘空间使用大小、用户的资源限制、是否启动了数据库审计功能。   
+@数据安全性---控制数据的存取和操作机制  
+1、用户管理   
+@Oracle初始化用户   
+sys---具有最高权限的用户，可启动修改关闭数据库，拥有数据字典   
+system---辅助的数据库管理员，不能启动关闭数据库，但能创建用户，删除用户等操作   
+scott---用于测试网络连接的用户，口令为tiger   
+public---实际上是一个用户组，数据库所有的用户都属于该组   
+  
+@用户认证方式   
+数据库身份认证---用户口令以加密的方式保存在数据库内部   
+create user u1 identified by wade399   
+  
+外部身份认证---用户的账户由ORACLE数据库管理，但口令管理和身份验证有外部服务完成，外部服务可以使操作系统和网络服务，   
+数据库不要求用户输入口令，但会从外部服务获取用户的登录信息，在这种方式下，oracle不会保存用户的口令信息，但需要创建响应的用户，   
+create user u2 identified externally   
+  
+全局身份认证---使用网络中的安全管理服务器对用户进行身份认证   
+create user u3 identified globally as 'cn=d1,l=dalian,c=us'  
+  
+@创建用户   
+创建用户名字为wade,口令为wade399，默认表空间名称为users,表空间配额为10M，初始状态密码过期需要修改，账户锁定   
+create user wade inentidied by wade399 default tablespace users quota 10M on users password expire account lock;   
+  
+@修改用户   
+修改用户wade的默认表空间users表空间配额为50M，orcltbs1表空间为10M，账户不锁定   
+alter user wade default tablespace users quota 50M on users quota 10M on orcltbs1 account unlock;   
+  
+@删除用户   
+drop user wade cascade  ---用户wade被删除，该用户所拥有的对象也随之删除   
+drop user wade          ---用户wade被删除，该用户所拥有的对象失效  
+2、权限管理   
+系统权限-----数据库级别执行某种操作的权限，超过100种系统权限，可将这些权限授予用户、角色、public用户组，若授予public用户组某些权限，则所有用户都具备；   
+对象权限-----对数据库对象执行某种操作的权限，增删改查   
+直接授权-----利用grant命令直接授权   
+间接授权-----先授权给角色，再把角色授予用户   
+ORACLE权限管里的过程就是权限授予与回收的过程   
+  
+@授权   
+注意   
+(1)只有DBA才有alter database的权限   
+(2)应用程序开发者一般具有create table,create view,create index等权限   
+(3)普通用户一般只具有create session系统会话连接权限   
+(4)授权时带有with admin option时，授权传递性，用户可以把这些权限传给其他用户   
+  
+为public用户组授权create session   
+grant create session to public  
+  
+为用户wade授予create table,create view，create session权限，wade再给wade2用户授予create table权限   
+system: grant create table,create view，create session to wade with admin option   
+wade  : grant create table to wade2   
+  
+revoke create table,create view，create session from wade;   
+虽然wade的权限被收回了，但是前段时间wade传给wade2的权限不受到影响   
+  
+对象权限：   
+将scott用户下的emp表的select、update权限授予wade，wade再给wade2用户授予emp表的select权限   
+system: grant select,update on scott.emp to wade with admin option   
+wade  : grant select on scott.emp to wade2   
+  
+revoke select,update on scott.emp from wade;   
+wade的权限被收回了，同时前段时间wade传给wade2的权限也没了 
+
+3、角色管理   
+所谓角色就是相关权限的集合，角色、用户、权限、授权的关系相当于工作流中的角色、用户、模块、权限的关系。   
+@预定义角色-----在数据库创建的时候系统自动创建的一些常用的角色，oracle中有30种，常见的有connect、resource、dba等   
+@自定义角色   
+create role r1                 (此不需要进行验证)   
+create role r2 identidied by r2    (此进行验证的口令为r2)   
+  
+@修改角色   
+alter role r1 identidied by r1   
+alter role r2 not identidied   
+  
+@角色的生效于失效   
+set role none   
+set role r1 none   
+  
+@删除角色   
+drop role r1   
+  
+@权限授予角色   
+grant create session,create table,create view to r1   
+revoke create session,create table,create view from r1;   
+  
+@角色授予角色   
+grant connect,dba to r1   
+revoke connect,dba from r1;   
+  
+@角色授予用户   
+grant connect,dba to wade   
+revoke connect,dba from wade;
+@权限授予用户   
+grant create session to wade   
+revoke create session from wade   
+  
+@用户角色屏蔽与激活   
+alter user wade default role none   
+alter user wade default role connect,dba   
+  
+4、概要文件管理   
+概要文件是数据库和系统资源限制的集合，是安全策略的组成部分，每个用户必须有一个概要文件，创建数据库的时候，会创建一个default的默认文件。   
+分为资源管理参数和口令管理参数。   
+  
+@创建一个概要文件，用户连续4次登录失败，锁定该账户，10天后自动解锁   
+create profile res_pro limit failed_login_attempts 4 password_lock_time 10;   
+  
+@创建一个概要文件，用户最多创建4个并发会话，每个回话最多持续60分钟，连续回话有20分钟空闲，停止会话，每个会话私有SQL区为100K，每个SQL语句占用CPU时间总量不超过10秒   
+create profile res_pro2 limit session_per_user 4 connect_time 60 idle_time 20 private_sga 100k cpu_per_call 10;   
+  
+@将概要文件分发给用户   
+alter user wade profile res_pro   
+  
+@删除概要文件   
+drop profile res_pro2   
+     
+二、备份恢复与数据导出   
+数据库备份的目的是防止意外丢失或毁坏数据，如果对数据库进行了备份，如果发生了意外也可以进行恢复   
+  
+1、物理备份与恢复   
+将数据库物理文件进行备份，包括数据文件、控制文件、重做日志文件、归档重做日志文件的物理复制   
+@冷备份----在数据库关闭状态下进行备份，恢复就是用备份的文件替换原来的文件   
+@热备份----在数据库开启状态下进行备份 
+
+2、逻辑备份与恢复   
+对表结构、模式对象进行备份，是SQL语句的集合   
+oracle的export工具读取数据并保存在一个称为导出转储文件（dmp）的二进制文件汇总，可以选择导出整个数据库、用户、表的内容。   
+exp help = y 显示导出工具帮助信息   
+@导出数据   
+  
+(1)交互式数据导出   
+exp   
+登录   
+导出文件：expdat> d:\test.dmp   
+(2)U(用户)，或(3)T表：U   
+  。   
+  。   
+  。   
+在没有警告的条件下成功终止导出   
+  
+(2)命令行模式导出   
+exp userid = scott/tiger file =d:/test.dmp tables=test   
+  
+(3)参数模式导出   
+I: 创建一个参数文件test.parfile   
+userid=scott/tiger   
+file=d:\test.dmp   
+tables=test   
+II: 输入命令行：exp parfile=d:\test.parfile   
+  
+(4)oOEM界面导出   
+orcl-数据管理-导出   
+  
+@导入数据   
+(1)交互式数据导入   
+imp   
+登录   
+导入文件：expdat> d:\test.dmp   
+  。   
+  。   
+  。   
+在没有警告的条件下成功终止导入 
+(2)命令行模式导入   
+imp userid = scott/tiger file =d:/test.dmp tables=test rows=y   
+  
+(3)参数模式导入   
+I: 创建一个参数文件test.parfile   
+userid=scott/tiger   
+file=d:\test.dmp   
+tables=test   
+II: 输入命令行：imp parfile=d:\test.parfile   
+  
+(4)oOEM界面导入   
+orcl-数据管理-导入   
+  
+3.监听器   
+Oracle net监听器简称监听器，是位于服务器端的一个后台进程，负责对客户端传入的连接请求进行监听，接收客户端的连接请求后，交给服务器进行处理，一旦   
+客户端和服务器的连接建立起来，两端可以直接通信，不需要监听器的参与。   
+常见的网络配置工具   
+Oracle Net Configuration Assistant   
+Oracle Net Manager   
+
+ 
+
+ 
+
+ 
+
+第五部分   PL/SQL编程     
+&概念   
+PL/SQL是oracle对标准SQL语言的过程化扩展，是Oracle专用的一种高级程序设计语言。   
+PL/SQL块分成2类，一为匿名块，动态生成，只能执行一次，不能由其它程序调用的块；   
+另一类为命名块，一次编译可多次执行的块，包括函数、存储过程、包、触发器等，编译后放在服务器中由应用程序或指定环境调用。   
+  
+&特点长处   
+(1)与sql语句紧密集成，所有SQL语句在PL/SQL中都得到支持；   
+(2)减少网络流量，提高应用程序的运行性能，一个PLSQL程序可包含多个SQL语句；   
+(3)模块化的程序设计功能，提高系统的可靠性；   
+(4)服务器端的程序设计，可移植性好，以编译的形式存储在数据库中；   
+  
+&PL/SQL程序块的组成   
+declare   
+   申明部分，定义变量，数据类型，异常，局部子程序等【可选】   
+begin   
+   执行部分，实现块的功能，可嵌套其它的子程序【必选】   
+exception   
+   异常处理部分【可选】   
+end;   
+  
+&定义一个包含子块的PL/SQL块   
+declare   
+  v_name varchar2(20);   
+  v_sal number(5);   
+begin    
+   begin   
+     select name into v_name from emp where empno = 1887;   
+   end;   
+   select avg(sal) into v_sal from emp where name = v_name;   
+   dbms_output.putline(v_sal);   
+end;   
+注： select ... into ...语句: 只能查出一条记录信息，没数据生成no_data_found异常，查询到多个记录则生成too_many_rows异常，返回多个记录用游标处理。   
+  
+&数据类型   
+数字类型：number(2,1),binary_integer。number(2,1)表示总共2位，小数点后1位   
+字符类型：varchar2(30),char,varchar。varchar2最大字节数oracle为4000，PL/SQL中为32767   
+日期类型：date,timestamp。   
+布尔类型：true,false,null。   
+%type和%rowtype: 定义一个变量的数据类型和表某一列的数据类型一致，表示为%type；和表结构一致，表示为%rowtype。   
+  v_name emp.name%type;   
+  v_emp emp%rowtype;  
+&变量与常量   
+变量名称 [constant] 数据类型 [not null] [default|:=  值]   
+v1 number(3);   
+v2 varchar2(20) not null := '4455';   
+v3 constant number(3,1) default 50.5;   
+  
+&DML操作   
+declare   
+  v_empno emp.empno%type;   
+  v_sal_after emp.sal%type;   
+begin   
+  select empno+'555' into v_empno from emp where empno = 7600;   
+  insert into emp(empno,ename,sal,deptno) values (v_empno,'Jon',2300,20);   
+  update emp set sal = sal+100 where empno = v_empno returning sal into v_sal_after;   //returning把修改之后的薪水返回   
+  delete emp where empno = v_empno;   
+  dbms_output.putline(v_sal_after);   
+end;   
+  
+&控制流程之【if】   
+declare   
+  v_no number(1) :=5;   
+  v_result varchar2(2);   
+begin   
+  if v_no < 5  then v_result := 'less then 5';   
+  else if v_no = 5  then v_result := 'equals 5';   
+  else if v_no > 5  then v_result := 'more then 5';   
+  else v_result := 'error';   
+  end if;   
+end;   
+  
+&控制流程之【case】   
+declare   
+  v_no number(1) :=5;   
+  v_result varchar2(2);   
+begin   
+  case v_no   
+  when 1 then v_result := 'equals 1';   
+  when 3 then v_result := 'equals 3';   
+  when 5 then v_result := 'equals 5';   
+  else v_result := 'other';   
+  end case;   
+  
+  case  
+  when v_no<5 then v_result := 'less then 5';   
+  when v_no=5 then v_result := 'equals 5';   
+  when v_no>5 then v_result := 'more then 5';   
+  else v_result := 'error';   
+  end case;   
+end;  
+
+&控制流程之【简单循环】   
+declare   
+  v_no binary_integer :=1;   
+begin   
+  loop   
+  insert into emp(empno,ename) values (v_no,'Jon');   
+  v_no:=v_no+1;   
+  exit when v_no = 50;   
+  end loop;   
+end;   
+  
+&控制流程之【while循环】   
+declare   
+  v_no binary_integer :=1;   
+begin   
+  while v_no <50 loop   
+  insert into emp(empno,ename) values (v_no,'Jon');   
+  v_no:=v_no+1;   
+  end loop;   
+end;   
+  
+&控制流程之【for循环】   
+declare   
+  v_no binary_integer :=1;   
+begin   
+  for v_no in 1..50 loop   
+  insert into emp(empno,ename) values (v_no,'Jon');   
+  end loop;   
+end;   
+  
+&异常处理   
+预定义异常--常见的异常   
+非预定义异常--不常见的异常   
+自定义异常   
+  
+declare   
+  v_no binary_integer :=2000;   
+  v_ex exception;   
+begin   
+  if v_no>1500 then raise v_ex;   
+exception   
+  when v_ex then dbms_output.put_line('too high!');    
+  when others then   
+  v_code:=sqlcode;   
+  v_text:=sqlerrm;   
+  dbms_output.put_line(v_code+':  '+v_text);    
+end;  
+
+&游标 --处理select语句返回多条数据   
+显示游标：用户自定义和操作   
+隐式图标：系统自动进行操作，用于处理DML语句和单行数据   
+  
+1. 显示游标   
+declare    
+cursor c1 is select id,name from book ;    //定义游标   
+v_id book.id%type;    
+v_name book.name%type;    
+begin    
+open c1;                                   //打开游标   
+loop    
+fetch c1 into v_id,v_name ;                //检索游标   
+exit when c1%notfound;    
+dbms_output.put_line(v_id+”;”+v_name);    
+end loop;    
+close c1;                                  //关闭游标   
+end;    
+/    
+  
+3种方式检索游标，以上是简单loop方式   
+open c1;         
+fetch c1 into v_id,v_name ;    
+while c1%found                                
+loop    
+fetch c1 into v_id,v_name ;                  
+dbms_output.put_line(v_id+”;”+v_name);    
+end loop;    
+close c1;      
+  
+for v_id,v_name  in c1         
+loop    
+fetch c1 into v_id,v_name ;                  
+dbms_output.put_line(v_id+”;”+v_name);    
+end loop;    
+注意：用for循环检索的时候不用打开、关闭游标   
+  
+显示游标的属性   
+%isopen  布尔型，游标是否打开   
+%found  布尔型，是否最近一次能检索到数据   
+%notfound   布尔型，与%found相反   
+%rowcount   数字型，返回到目前为止游标从缓冲区检索到的记录个数 
+
+参数化游标   
+declare   
+cursor c_1(e_name emp.ename%type,e_sal emp.sal%type) is select * from emp where ename = e_name and sal < e_sal;   
+v_emp emp%rowtype;   
+begin   
+open c_1('wade',4000);   
+loop    
+fetch c_1 into v_emp;   
+dbms_output.put_line(v_emp.empno);    
+exit when c_1%notfound;   
+end loop;   
+end;   
+  
+利用游标更新或删除数据   
+declare   
+cursor c_1(e_name emp.ename%type,e_sal emp.sal%type) is select * from emp where ename = e_name and sal < e_sal for update;   
+v_emp emp%rowtype;   
+begin   
+open c_1('wade',4000);   
+loop    
+fetch c_1 into v_emp;   
+update emp set sal =sal+100 where current of c_1;   
+exit when c_1%notfound;   
+end loop;   
+end;   
+  
+2.隐式游标   
+sql%isopen  布尔型，游标是否打开   
+sql%found  布尔型，是否最近一次能检索到数据   
+sql%notfound   布尔型，与%found相反   
+sql%rowcount   数字型，返回到目前为止游标从缓冲区检索到的记录个数   
+  
+begin    
+update emp set sal =sal+100 where empno =1009;   
+if sql%notfound or sql%rowcount =0 then   
+insert into emp(empno,sal) values ('1009',2000);   
+end if;   
+end;  
+
+
+&存储子程序-----指被命名的PL/SQL块，以编译的形式存储在数据库服务器中，可以在应用程序中进行调用，包括存储过程、函数   
+  
+存储过程和函数区别：   
+通常存储过程是一个独立的表达式被调用，没有返回值；   
+函数是一个独立的表达式的组成部分被调用，有返回值；   
+  
+1. 存储过程    
+(1) 参数模式   
+in- 默认的，调用过程中实参没有被形参改变；   
+out - 返回调用环境时，形参的值赋予实参；   
+inout- 返回调用环境时，形参的值赋予实参；   
+  
+create or replace proceduce p1(v_id in number(10),v_name in varchar(10)) as    
+v_id number(10);    
+v_name varchar(20);    
+begin    
+dbms_output.put_line(v_id+”;”+v_name);    
+end;    
+  
+declear    
+v_id number(10):=10;    
+v_name varchar(20):=’wade’;    
+begin   
+exec p1(v_id,v_name);    
+call p1(v_id,v_name);    
+end;   
+  
+&触发器----是特殊的存储过程，由系统自动的调用，不能由应用程序调用。   
+1 触发器的组成   
+(1)建立在基本表的操作(DML触发器),响应基本的增删改操作；   
+   建立在视图上面的操作(instead of触发器)；   
+   建立在系统或模块上面的操作(系统触发器)；   
+(2)触发事件可以用OR连接起来   
+(3)触发时间可以是before和after   
+(4)触发级别：   
+   语句级（触发一次执行一次）   
+   行级for each row（触发事件每作用于一行记录，触发一次）   
+(5)触发条件和触发操作
+
+create or replace trigger t1 after insert or delete or update on book for each row;   
+declear    
+v_id number(10):=1;    
+v_name number(10):=1;    
+begin    
+loop    
+insert into shop(id,name) values(v_id, v_name);    
+v_id++;    
+v_name++;    
+exit when v_id = 100000;    
+end loop;    
+end t1;    
+  
+create or replace trigger t2 before update of sal on emp for each row when (old.sal<new.sal)   
+begin    
+raise_application_error(-2000,'error...');   
+end t2;   
+  
+alter trigger t1 disable;   
+alter trigger t1 enable;   
+drop trigger t1;   
+  
+&函数   
+create or replace function f1(e_no emp.empno%type) return emp.sal%type as   
+v_sal emp.sal%type;   
+begin    
+select sal into v_sal from emp where empno = e_no;   
+return v_sal;   
+end f1;   
+  
+declare   
+v_sal emp.sal%type;   
+begin    
+v_sal = f1(1996);   
+end;   
+  
+alter function f1 compile;   
+drop function f1;  
+
+&包------将相关的PL/SQL块或元素（过程、函数、变量、游标等）组织在一起，成为一个完整的单元，供应用程序调用。   
+create or replace package body pp1 as   
+  create or replace proceduce p1(v_id number(10),v_name varchar(10)) as     
+  begin    
+    dbms_output.put_line(v_id+”;”+v_name);    
+  end p1;    
+  
+  create or replace proceduce p2() as     
+  begin    
+    dbms_output.put_line('55555');    
+  end p1;    
+end pp1;   
+  
+  
+begin   
+  pp1.p1(23,'wade');   
+  pp1.p2();   
+end;  
+

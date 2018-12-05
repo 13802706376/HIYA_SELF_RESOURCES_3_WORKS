@@ -1,0 +1,26 @@
+DateFormat formatTime = DateFormat.getDateTimeInstance();
+            DateFormat formatDate = DateFormat.getDateInstance();
+            
+            1.带时间的date类型
+            String timeStr = "2010-11-12 12:33:21";
+            Date time = formatTime.parse(timeStr);
+            
+            2.不带时间的date类型，默认为00:00:00
+            String dateStr = "2010-11-12";
+            Date date = formatDate.parse(dateStr);
+          
+            3.格式化time 与date 
+
+            String str5 = formatDate.format(date);
+            String str6 = formatTime.format(time);
+            
+            4.任意格式去格式化time 
+
+            String format1 = "yyyy-MM-dd hh:mm:ss";
+            String format2 = "yyyyMMddhhmmss";
+            String format3 = "yyyy/MM/dd hh:mm:ss";
+            String format4 = "yyyy_MM_dd_hh_mm_ss";
+            String time1 = FastDateFormat.getInstance(format1).format(time);
+            String time2 = FastDateFormat.getInstance(format2).format(time);
+            String time3 = FastDateFormat.getInstance(format3).format(time);
+            String time4 = FastDateFormat.getInstance(format4).format(time);

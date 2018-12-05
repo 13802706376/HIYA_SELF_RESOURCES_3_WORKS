@@ -1,0 +1,17 @@
+public String getNextDay(String time)    
+    {   
+        Date dd2 = null;   
+        DateFormat af = DateFormat.getDateInstance();   
+        try  
+        {   
+            if(null!=time)   
+            {   
+                Date dd = af.parse(time);   
+                dd2 = new Date(dd.getTime()+1000*60*60*24);   
+            }   
+        } catch (ParseException e)   
+        {   
+            e.printStackTrace();   
+        }   
+        return null!=dd2?af.format(dd2):"";   
+    }   

@@ -1,0 +1,55 @@
+        List<Book2> list = new ArrayList<Book2>();   
+        Book2 b1 = new Book2("员工出差",23,2);   
+        Book2 b2 = new Book2("国内请假",13,4);   
+        Book2 b3 = new Book2("国内请假",17,6);   
+        Book2 b4 = new Book2("国内请假",20,6);   
+        list.add(b1);list.add(b2);list.add(b3);list.add(b4);   
+           
+        List<Book2> lastList = new ArrayList<Book2>();   
+        List<String> nameList = new ArrayList<String>();   
+        Map<String,Integer> aMap = new HashMap<String,Integer>();   
+        Map<String,Integer> uMap = new HashMap<String,Integer>();   
+        if(null!=list&&list.size()>0)   
+        {   
+         for(int k=0;k<list.size();k++)   
+         {   
+             Book2 vo = (Book2)list.get(k);   
+            if(!nameList.contains(vo.getName()))   
+                {   
+                nameList.add(vo.getName());   
+                }   
+         }   
+         for(int k=0;k<list.size();k++)   
+         {   
+             Book2 vo = (Book2)list.get(k);   
+             if(nameList.contains(vo.getName()))   
+             {   
+                 if(aMap.get(vo.getName())==null&&uMap.get(vo.getName())==null)   
+                 {   
+                    aMap.put(vo.getName(), vo.getAa());   
+                    uMap.put(vo.getName(), vo.getUu());   
+                 }   
+                 else  
+                 {   
+                     Integer aaa = aMap.get(vo.getName())+vo.getAa();   
+                     Integer uuu = uMap.get(vo.getName())+vo.getUu();   
+                    aMap.remove(vo.getName());   
+                    aMap.put(vo.getName(), aaa);   
+                    uMap.remove(vo.getName());   
+                    uMap.put(vo.getName(), uuu);   
+                 }   
+             }   
+         }   
+            
+         for(int k=0;k<nameList.size();k++)   
+         {   
+             String name = nameList.get(k);   
+            Book2 book = new Book2(name,aMap.get(name),uMap.get(name));   
+            lastList.add(book);   
+         }   
+            
+         System.out.println("lastList=="+lastList.get(1).getName());   
+        System.out.println("lastList=="+lastList.get(1).getAa());   
+        System.out.println("lastList=="+lastList.get(1).getUu());   
+        }   
+    }   

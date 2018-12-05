@@ -1,0 +1,29 @@
+                     int index = 0;   
+                     long tabAccessSum = 0;   
+                     for (int i = 0;i < proList.size(); i++)    
+                     {   
+                         StatisticAccessVO voPro = (StatisticAccessVO) proList.get(i);    
+                         String operateId = voPro.getOperateId();   
+                         bodyArray[index][0]=(i+1)+"";   
+                          if(null!=voPro.getOperateName()&&voPro.getOperateName().trim().length()>0)                                
+                          {   
+                                 bodyArray[index][1]=SecurityString.filter(voPro.getOperateName());   
+                          }   
+                                 bodyArray[index][2]=voPro.getAffiliatedChannel()==null?"":SecurityString.filter(voPro.getAffiliatedChannel());   
+                                 bodyArray[index][3]=voPro.getAccessCount()+"";   
+                                 bodyArray[index][4]=voPro.getUserCount()+"";    
+                                 for (int p = 0;p < statisticList.size(); p++)    
+                                  {   
+                                       StatisticAccessVO vo = (StatisticAccessVO) statisticList.get(p);    
+                                       if(null!=operateId&&null!=vo.getOperateId()&&operateId.equals(vo.getOperateId()))   
+                                       {   
+                                         bodyArray[index][5]=vo.getCitationChannel()==null?"":SecurityString.filter(vo.getCitationChannel());   
+                                         bodyArray[index][6]=vo.getProAcessCount()+"";   
+                                         bodyArray[index][7]=vo.getProUserCount()+"";    
+                                         index ++;   
+                                         tabAccessSum+=vo.getProAcessCount();   
+                                       }   
+                                  }   
+                     }   
+                        
+                     writeExportCsv(csvFileOutputStream,null,null,bodyArray,null,"writer",0);  

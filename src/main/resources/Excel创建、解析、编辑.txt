@@ -1,0 +1,286 @@
+package com.umt.czj;
+
+public class Book
+{
+    private Integer id;
+    
+    private String name;
+    
+    private Double price;
+    
+    private String authorName;
+    
+    public String getAuthorName()
+    {
+        return authorName;
+    }
+    
+    public void setAuthorName(String authorName)
+    {
+        this.authorName = authorName;
+    }
+    
+    public Integer getId()
+    {
+        return id;
+    }
+    
+    public void setId(Integer id)
+    {
+        this.id = id;
+    }
+    
+    public Book(Integer id, String name, Double price, String authorName)
+    {
+        
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.authorName = authorName;
+    }
+    
+    public Book()
+    {
+        
+    }
+    
+    public String getName()
+    {
+        return name;
+    }
+    
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+    
+    public Double getPrice()
+    {
+        return price;
+    }
+    
+    public void setPrice(Double price)
+    {
+        this.price = price;
+    }
+    
+}
+
+
+
+
+
+
+
+
+package com.umt.czj;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import jxl.write.Number;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+
+/**
+ * 利用java技术对Excel文件进行创建、编辑、解析
+ * @author caozhijun
+ * 1.创建一个新的excel文件
+ * 2.创建之后解析循环输出里面的内容
+ * 3.修改文件的内容
+ */
+public class DoExcel
+{
+    
+    public static void main(String[] args)
+    {
+        //创建新的excel文件
+        DoExcel excel = new DoExcel();
+        List<Book> data = new ArrayList<Book>();
+        Book book1 = new Book(455, "JAVA se", 103.4, "czj");
+        Book book2 = new Book(4009, "Ajax", 66.0, "james");
+        Book book3 = new Book(3, "三国志", 77.4, "科比");
+        Book book4 = new Book(44, "水浒传", 93.4, "韦德");
+        Book book5 = new Book(765, "中国交通地图册", 67.4, "麦蒂");
+        data.add(book1);
+        data.add(book2);
+        data.add(book3);
+        data.add(book4);
+        data.add(book5);
+        excel.writeExcelFile(data);
+        System.out.println("Write file successfully！");
+        
+        //输出解析后的文件内容
+        List<Book> list = excel.parseExcelFile();
+        for (Book book : list)
+        {
+            System.out.println(book.getId() + ";" + book.getName() + ";"
+                    + book.getPrice() + ";" + book.getAuthorName());
+            
+        }
+        
+        //编辑文件
+        excel.editExcelFile();
+    }
+    
+    /**
+     * 读取文件
+     * @return
+     */
+    public List<Book> parseExcelFile()
+    {
+        try
+        {
+            
+            List<Book> books = new ArrayList<Book>();
+            
+            //创建要读取文件对象
+            Workbook book = Workbook.getWorkbook(new File("f://book.xls"));
+            
+            //获得第一页
+            Sheet sheet1 = book.getSheet(0);
+            for (int j = 1; j < sheet1.getRows(); j++)
+            {
+                Book bookTemp = new Book();
+                
+                //对象属性设值
+                for (int i = 0; i < sheet1.getColumns(); i++)
+                {
+                    if (0 == i)
+                    {
+                        //sheet的getCell(i,j)方法获得第i+1列，第j+1行的单元格
+                        bookTemp.setId(new Integer(sheet1.getCell(i, j)
+                                .getContents()));
+                    }
+                    else if (1 == i)
+                    {
+                        bookTemp.setName(sheet1.getCell(i, j).getContents());
+                    }
+                    else if (2 == i)
+                    {
+                        bookTemp.setPrice(new Double(sheet1.getCell(i, j)
+                                .getContents()));
+                    }
+                    else
+                    {
+                        bookTemp.setAuthorName(sheet1.getCell(i, j)
+                                .getContents());
+                    }
+                }
+                
+                //把对象加入到集合里面
+                books.add(bookTemp);
+                
+            }
+            return books;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+        
+    }
+    
+    /**
+     * 编辑文件 
+     */
+    public void editExcelFile()
+    {
+        try
+        {
+            //获得要编辑的文件
+            Workbook book2 = Workbook.getWorkbook(new File("f://book.xls"));
+            
+            //利用book2得到该文件的副本
+            WritableWorkbook bookWri = Workbook.createWorkbook(new File(
+                    "f://book.xls"), book2);
+            WritableSheet sheet1 = bookWri.getSheet(0);
+            
+            //此项操作将会覆盖单元格{0，0}的内容，完成编辑的功能
+            sheet1.addCell(new Label(0, 0, "编号22"));
+            
+            //在原有基础上增加第三页
+            WritableSheet sheet2 = bookWri.createSheet("第三页", 2);
+            sheet2.addCell(new Label(0, 0, "Wade"));
+            bookWri.write();
+            bookWri.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
+    }
+    
+    /**
+     * 写入文件
+     * @param list
+     */
+    public void writeExcelFile(List<Book> list)
+    {
+        
+        try
+        {
+            //获得可写的文件对象，
+            WritableWorkbook excel = Workbook.createWorkbook(new File(
+                    "f://book.xls"));
+            
+            //创建第一页，名字自由设置
+            WritableSheet sheet1 = excel.createSheet("购书清单", 0);
+            
+            //设置第一行的第一、第二、第三列单元格的内容
+            sheet1.addCell(new Label(0, 0, "编号"));
+            sheet1.addCell(new Label(1, 0, "书名"));
+            sheet1.addCell(new Label(2, 0, "价格"));
+            sheet1.addCell(new Label(3, 0, "作者"));
+            
+            //把集合中的book对象迭代到文件中
+            for (int i = 0; i < list.size(); i++)
+            {
+                Book book = list.get(i);
+                for (int j = 0; j < 4; j++)
+                {
+                    
+                    if (0 == j)
+                    {
+                        //new Number(i,j,44.4)数字类型的表达方式
+                        sheet1.addCell(new Number(j, i + 1, book.getId()));
+                    }
+                    else if (1 == j)
+                    {
+                        //new Label(i,j,"ll")字符串类型的表达方式
+                        sheet1.addCell(new Label(j, i + 1, book.getName()));
+                    }
+                    else if (2 == j)
+                    {
+                        sheet1.addCell(new Number(j, i + 1, book.getPrice()));
+                    }
+                    else
+                    {
+                        sheet1.addCell(new Label(j, i + 1, book.getAuthorName()));
+                    }
+                    
+                }
+                
+            }
+            
+            WritableSheet sheet2 = excel.createSheet("第二页", 1);
+            sheet2.addCell(new Label(0, 0, "McGrady"));
+            
+            //写入操作
+            excel.write();
+            excel.close();
+            
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
+    }
+}
+

@@ -1,0 +1,69 @@
+JAVA发送手机短信,流传有几种方法:(1)使用webservice接口发送手机短信,这个可以使用sina提供的webservice进行发送,但是需要进行注册;(2)使用短信mao的方式进行短信的发送,这种方式应该是比较的常用,前提是需要购买硬件设备,呵呵(3)使用中国网建提供的SMS短信平台（申请账号地址：http://sms.webchinese.cn/default.shtml） 
+
+本程序主要是运用了中国网建提供的SMS短信平台，这个短信平台基于java提供个专门的接口，话不多说。，上代码，有代码有真相，呵呵 
+
+[java] view plaincopyprint? 
+package com.text;  
+  
+import org.apache.commons.httpclient.Header;  
+import org.apache.commons.httpclient.HttpClient;  
+import org.apache.commons.httpclient.NameValuePair;  
+import org.apache.commons.httpclient.methods.PostMethod;  
+  
+public class SendMsg_webchinese {  
+  
+    public static void main(String[] args) throws Exception {  
+  
+        HttpClient client = new HttpClient();  
+        PostMethod post = new PostMethod("http://sms.webchinese.cn/web_api/");  
+        post.addRequestHeader("Content-Type",  
+                "application/x-www-form-urlencoded;charset=gbk");// 在头文件中设置转码  
+        NameValuePair[] data = { new NameValuePair("Uid", "cshxxxxxxxx"), // 注册的用户名  
+                new NameValuePair("Key", "53295058d1c46710666a"), 
+// 注册成功后,登录网站使用的密钥，这个密钥要登录到国建网然后有一个API接口，点进去就有一个key，可以改，那个才是密钥  
+                new NameValuePair("smsMob", "187xxxxxxx"), // 手机号码  
+                new NameValuePair("smsText", "通知") };//设置短信内容          
+  post.setRequestBody(data); 
+client.executeMethod(post);  
+Header[] headers = post.getResponseHeaders();  
+int statusCode = post.getStatusCode();  
+System.out.println("statusCode:" + statusCode); 
+for (Header h : headers) { 
+System.out.println(h.toString());  
+}  
+  String result = new String(post.getResponseBodyAsString().getBytes(  
+  "gbk"));  
+System.out.println(result);  
+post.releaseConnection();  
+}  
+运行本程序首先的代入三个jar包： 
+
+commons-codec-1.4 
+
+commons-httpclient-3.1 
+
+commons-logging-1.1.1 
+
+请自行下载，呵呵 
+
+GBK编码发送接口地址： 
+http://gbk.sms.webchinese.cn/?Uid=本站用户名&Key=接口安全密码&smsMob=手机号码&smsText=短信内容 
+UTF-8编码发送接口地址： 
+http://utf8.sms.webchinese.cn/?Uid=本站用户名&Key=接口安全密码&smsMob=手机号码&smsText=短信内容 
+获取短信数量接口地址(UTF8)： 
+http://sms.webchinese.cn/web_api/SMS/?Action=SMS_Num&Uid=本站用户名&Key=接口安全密码 
+获取短信数量接口地址(GBK)： 
+http://sms.webchinese.cn/web_api/SMS/GBK/?Action=SMS_Num&Uid=本站用户名&Key=接口安全密码 
+
+
+
+短信发送后返回值 说　明 
+-1 没有该用户账户 
+-2 密钥不正确（不是用户密码） 
+-3 短信数量不足 
+-11 该用户被禁用 
+-14 短信内容出现非法字符 
+-41 手机号码为空 
+-42 短信内容为空 
+大于0 短信发送数量 
+

@@ -1,0 +1,322 @@
+
+
+
+
+从控制台中获取字符串，如
+
+“hksdfjJHHuhuBJH88...&*$$%56HGGFGH77778JJK”,包含字母、数字、特殊字符等，打印出该字符串中出现次数最多的字符和出现的次数，如果有多个，则打印出多个；打印出该字符串中出现次数最少的字符和出现的次数，如果也有多个，则打印出多个；区分大小写！
+
+ 
+
+ 
+
+代码实现如下：
+
+ 
+
+ 
+
+ 
+
+package com.umt.string;
+
+ 
+
+import java.util.ArrayList;
+
+import java.util.Collections;
+
+import java.util.HashMap;
+
+import java.util.Iterator;
+
+import java.util.List;
+
+import java.util.Map;
+
+import java.util.Scanner;
+
+ 
+
+public class StringShowingMostChar
+
+{
+
+    public static void main(String h[])
+
+    {
+
+        /**
+
+         * 控制台输入流对象
+
+         */
+
+        Scanner scanner = new Scanner(System.in);
+
+        
+
+        /**
+
+         * 从控制台得到待处理的字符串waitProcessString
+
+         * 并打印输出该字符串waitProcessString
+
+         */
+
+        String waitProcessString = scanner.next();
+
+        System.out.println("你好，你输入的字符串为:  " + waitProcessString);
+
+        
+
+        /**
+
+         * waitProcessString转化成的集合形式
+
+         */
+
+        List<String> list_waitProcessString = new ArrayList<String>();
+
+        
+
+        /**
+
+         * waitProcessString转化成的集合形式，里面不含重复的元素
+
+         */
+
+        List<String> list_noRepeat = new ArrayList<String>();
+
+        
+
+        for (int i = 0; i < waitProcessString.length(); i++)
+
+        {
+
+            list_waitProcessString.add(waitProcessString.substring(i, i + 1));
+
+        }
+
+        for (int i = 0; i < list_waitProcessString.size(); i++)
+
+        {
+
+            String temp = list_waitProcessString.get(i);
+
+            
+
+            if (!list_noRepeat.contains(temp))
+
+            {
+
+                
+
+                list_noRepeat.add(temp);
+
+            }
+
+            
+
+        }
+
+        
+
+        /**
+
+         * map封装字符和相应的次数的key-value值
+
+         */
+
+        
+
+        Map<String, Integer> map = new HashMap<String, Integer>();
+
+        
+
+        for (int i = 0; i < list_noRepeat.size(); i++)
+
+        {
+
+            int count = 0;
+
+            
+
+            for (int j = 0; j < list_waitProcessString.size(); j++)
+
+            {
+
+                
+
+                if (list_waitProcessString.get(j).equals(list_noRepeat.get(i)))
+
+                {
+
+                    count += 1;
+
+                    
+
+                }
+
+                
+
+            }
+
+            map.put(list_noRepeat.get(i), count);
+
+            
+
+        }
+
+        
+
+        /**
+
+         * list_values为map的value集合，并排序
+
+         */
+
+        List<Integer> list_values = new ArrayList<Integer>();
+
+        
+
+        Iterator iterator_values = map.values().iterator();
+
+        while (iterator_values.hasNext())
+
+        {
+
+            Integer value = (Integer)iterator_values.next();
+
+            
+
+            list_values.add(value);
+
+        }
+
+        
+
+        Collections.sort(list_values);
+
+        
+
+        /**
+
+         * 输出出现最多的字符和相应的次数
+
+         */
+
+        
+
+        Iterator iterator_most = list_noRepeat.iterator();
+
+        
+
+        while (iterator_most.hasNext())
+
+        {
+
+            String singerChar = (String)iterator_most.next();
+
+            
+
+            if (list_values.get((list_values.size() - 1)) == map.get(singerChar))
+
+            {
+
+                System.out.println("出现次数最多的字符为: " + singerChar + "；出现最多的次数为："
+
+                        + list_values.get((list_values.size() - 1)));
+
+            }
+
+            
+
+        }
+
+        
+
+        /**
+
+         * 输出出现最少的字符和相应的次数
+
+         */
+
+        Iterator iterator_least = list_noRepeat.iterator();
+
+        
+
+        while (iterator_least.hasNext())
+
+        {
+
+            String singerChar = (String)iterator_least.next();
+
+            
+
+            if (list_values.get(0) == map.get(singerChar))
+
+            {
+
+                System.out.println("出现次数最少的字符为: " + singerChar
+
+                        + "；出现最少的次数为：" + list_values.get(0));
+
+                
+
+            }
+
+            
+
+        }
+
+        
+
+    }
+
+}
+
+ 
+
+ 
+
+ 
+
+执行结果：
+
+
+
+dhfgdjgjfdhjdfh...._-*&^%##$%^73457467777547657idfgduHGJhuhhdsfguuufuuduugdgj
+
+你好，你输入的字符串为: dhfgdjgjfdhjdfh...._-*&^%##$%^73457467777547657idfgduHGJhuhhdsfguuufuuduugdgj
+
+出现次数最多的字符为: d ；出现最多的次数为： 9
+
+出现次数最多的字符为: u ；出现最多的次数为： 9
+
+出现次数最少的字符为: - ；出现最少的次数为：1
+
+出现次数最少的字符为: _ ；出现最少的次数为：1
+
+出现次数最少的字符为: * ；出现最少的次数为：1
+
+出现次数最少的字符为: # ；出现最少的次数为：1
+
+出现次数最少的字符为: 3 ；出现最少的次数为：1
+
+出现次数最少的字符为: i ；出现最少的次数为：1
+
+出现次数最少的字符为:H ；出现最少的次数为：1
+
+出现次数最少的字符为:G；出现最少的次数为：1
+
+出现次数最少的字符为: J ；出现最少的次数为：1
+
+出现次数最少的字符为: s ；出现最少的次数为：1
+
+ 
+
+ 
+
+ 
+

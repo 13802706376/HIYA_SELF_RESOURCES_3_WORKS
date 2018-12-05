@@ -1,0 +1,156 @@
+
+
+
+
+
+package com.umt.czj;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.jar.JarOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+public class DoZipAndJar
+{
+    
+    public static void main(String[] args)
+    {
+        DoZipAndJar doZip = new DoZipAndJar();
+        
+        //把f://book1.xls、f://book2.xls文件压缩到f://java/zip 中的book.zip
+        try
+        {
+            List<File> sourceFileZip = new ArrayList<File>();
+            
+            File sourceFileZip1 = new File("f://book.xls");
+            File sourceFileZip2 = new File("f://book2.xls");
+            sourceFileZip.add(sourceFileZip1);
+            sourceFileZip.add(sourceFileZip2);
+            File resultFileZip = new File("f://java/zip/Book.zip");
+            
+            //如果目录不存在则创建新的目录
+            if (!new File("f://java/zip").exists())
+            {
+                new File("f://java/zip").mkdirs();
+            }
+            doZip.createZipFile(sourceFileZip, resultFileZip);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            System.out.println("Sorry! create zip file failed!");
+        }
+        System.out.println("Congratulations! create zip file successfully!");
+        
+        //把f://DoExcel.class、f://bus.service.xml文件打包到f://java/jar 中的bus_cc_r3.jar
+        try
+        {
+            List<File> sourceFileJar = new ArrayList<File>();
+            File sourceFileJar1 = new File("f://DoExcel.class");
+            File sourceFileJar2 = new File("f://bus.service.xml");
+            sourceFileJar.add(sourceFileJar1);
+            sourceFileJar.add(sourceFileJar2);
+            
+            File resultFileJar = new File("f://java/jar/bus_cc_r3.jar");
+            if (!new File("f://java/jar").exists())
+            {
+                new File("f://java/jar").mkdirs();
+            }
+            doZip.createJarFile(sourceFileJar, resultFileJar);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            System.out.println("Sorry! create jar file failed!");
+        }
+        System.out.println("Congratulations! create jar file successfully!");
+    }
+    
+    /**
+     * 把f://book.xls文件压缩到f://java/zip 中的book.zip
+     * @param sourceFile
+     * @param resultFile
+     */
+    public void createZipFile(List<File> sourceFileList, File resultFile)
+    {
+        FileInputStream in = null;
+        try
+        {
+            //实例化Zip文件输出流
+            ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(
+                    resultFile));
+            
+            //实例化所要压缩文件集合输入流
+            for (File sourceFile : sourceFileList)
+            {
+                in = new FileInputStream(sourceFile);
+                
+                //Zip文件输出流装入zip条目
+                zipOut.putNextEntry(new ZipEntry(sourceFile.getName()));
+                int i = 0;
+                
+                //压缩文件到指定目录
+                while ((i = in.read()) != -1)
+                {
+                    zipOut.write(i);
+                }
+                
+            }
+            in.close();
+            zipOut.close();
+            
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
+    }
+    
+    /**
+     * 把f://DoExcel.class文件压缩到f://java/jar 中的book.jar
+     * @param sourceFile
+     * @param resultFile
+     */
+    public void createJarFile(List<File> sourceFileList, File resultFile)
+    {
+        FileInputStream in = null;
+        try
+        {
+            //实例化jar文件输出流
+            JarOutputStream jarOut = new JarOutputStream(new FileOutputStream(
+                    resultFile));
+            
+            for (File sourceFile : sourceFileList)
+            {
+                //实例化所要压缩文件集合输入流
+                in = new FileInputStream(sourceFile);
+                
+                //jar文件输出流装入jar条目
+                jarOut.putNextEntry(new ZipEntry(sourceFile.getName()));
+                int i = 0;
+                
+                //把文件放到到指定目录
+                while ((i = in.read()) != -1)
+                {
+                    jarOut.write(i);
+                }
+                
+            }
+            in.close();
+            jarOut.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+
+

@@ -1,0 +1,128 @@
+//oracle 函数   
+select to_date('2011-01-12','yyyy-mm-dd') from  t_application_info;   
+select to_char(55555555) from  t_application_info;   
+select to_char(sysdate,'yyyy-mm-dd') from  t_application_info;   
+select to_number('24000000') from  t_application_info;   
+  
+  
+  
+  
+//表的连接   
+select * from t_application_info ap,t_profile t where ap.app_id = t.bussines_id;  --自然连接   
+select * from t_application_info ap join t_profile t on  ap.app_id = t.bussines_id;  --等效自然连接，写法不一样而已   
+select * from t_application_info ap left join t_profile t on  ap.app_id = t.bussines_id;  --左连接，以左表为基准，右表为空的记录页查询出来   
+select * from t_application_info ap right join t_profile t on  ap.app_id = t.bussines_id;  --右连接，以右表为基准，左表为空的记录页查询出来   
+select * from t_application_info ap full join t_profile t on  ap.app_id = t.bussines_id;  --全连接，左表和右表为空的记录页查询出来   
+select * from t_application_info ap where ap.app_id in(select distinct(t.bussines_id) from t_profile t); --类似自然连接，但只能查询左表的属性   
+     
+select * from t_application_info ap left join   
+(select * from t_application_info ap,t_profile t where ap.app_id = t.bussines_id) w1    
+on ap.app_id = w1.bussines_id                                                              --多表连接，原理是把一个或若干个连接的结果当做一个表再与外表进行连接   
+     
+select *   
+from t_application_info ap,   
+(select * from t_profile t1 where t1.bussines_id is not null) t   
+where ap.app_id = t.bussines_id;                                                           --原理是把一个或若干个连接的结果当做一个表在与外表自然连接   
+     
+     
+select w2.*   
+from (select w1.*, rownum mynum   
+from (select * from t_application_info) w1   
+where rownum <= 100) w2   
+where mynum >= 20                                                                            --分页语句   
+ //批量新增数据SQL语句   
+   insert into t_profile   
+   select SEQ_APPLICATION_INFO.Nextval id,   
+     buid.id bussines_id,   
+     th.profile_ids,   
+     th.profile_names,   
+     th.id,   
+     th.profile_name,   
+     th.profile_type,   
+     buid.type,   
+     th.language   
+     from (select id,'catalog' type   
+        from (select b.id   
+                from w3cn.catalog b   
+               start with b.id = '4517'  
+              connect by nocycle prior b.id = b.parentid) c1   
+       where c1.id != '4517'  
+      union all   
+      select d.web_doc_id id,'document' type   
+        from w3cn.documentation d   
+       where d.cid in (   
+                       select *   
+                         from (select b.id ID   
+                                  from w3cn.catalog b   
+                                 start with b.id = '4517'  
+                                connect by nocycle prior b.id = b.parentid) c1   
+                        where c1.id != '4517')   
+         and d.doc_status = 2) buid,   
+     (select * from t_profile p where p.bussines_id = '4517') th   
+  
+  
+              //JDBC的批量新增逻辑   
+boolean isOperateing = false;   
+String sqlStr = " insert into w3en.t_profile(id,language)values (?, ?)";   
+if(isOperateing)   
+{   
+    return false;   
+}   
+PreparedStatement sm = null;   
+for (Object object : items)    
+{   
+    UserProfileVO item = (UserProfileVO)object;   
+    sm.setString(1, item.getId());   
+    sm.setString(2, null==item.getBussines_id()?"":item.getBussines_id());   
+    sm.addBatch();   
+}   
+sm.executeBatch();   
+              isOperateing = true;  
+
+
+
+
+//找到有重复的数据   
+    select a.timestamp, a.userid, a.start_datetime   
+    from t_huawei_log_events a   
+    where rowid > (select min(rowid)   
+                 from t_huawei_log_events b   
+                where a.timestamp = b.timestamp   
+                and a.start_datetime = b.start_datetime   
+                )   
+  
+   //删除   
+   delete from t_huawei_log_events u where to_number(substr(timestamp,0,8)) < 20110901   
+  
+  
+  
+    返回字符的内存量   
+    function checkStrLen(str)    
+    {   
+    var valueLen = 0;   
+    if (str == "")    
+               {   
+        return 0;   
+    }   
+    for (i = 0; i < str.length; i++)    
+               {   
+        var code = escape(str.charAt(i));   
+        if ((code.length >= 4) && (code < "%uFF60" || code > "%uFF9F"))    
+                       {   
+            valueLen += 3;   
+        }    
+                       else  
+                       {   
+            valueLen += 1;   
+        }   
+    }   
+    return valueLen;   
+    }   
+  
+    //去除特殊字符、前后空格   
+    word=word.replace(/[\{\}\|\[\]\<\>\#\、\·\！\,\.\;\/\……\（\）\——\”\“\：\’\‘\；\《\》\，\。\【\】\\]/g,"");   
+    word = word.replace(/(^\s*)|(\s*$)/g,"");   
+  
+    //   
+      window.setTimeout("alert(5555);",3000);   
+      window.setInterval("alert(5555);",1000);  

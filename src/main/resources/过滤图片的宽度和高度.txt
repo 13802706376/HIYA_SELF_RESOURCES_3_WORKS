@@ -1,0 +1,7 @@
+import javax.imageio.ImageIO;   
+import java.awt.image.BufferedImage;   
+  
+BufferedImage bigPicImage = ImageIO.read(bifPicFile);   
+  
+if(bigPicImage.getHeight()!=64||bigPicImage.getWidth()!=64)   
+{}  
